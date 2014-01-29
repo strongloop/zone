@@ -332,27 +332,55 @@ function Gate(dependency, fn) {
   var dependant = zone;
   var id = uid();
   
-  if (!dependant.childOf(dependency))
-    throw new Error('Dependant zone is not a child of the dependency zone');
-    
-  dependency._register(id, self, false);
-  dependant._register(id, self, true);
+  if (dependant === dependency) {
+    // A gate between a zone and itself is a no-op.
+    self.signal = function(error) {
+      // Ignore
+    };
   
-  self.signal = function(error) {
-    if (error) {
-      if (zone === dependant)
-        dependency.signal(error);
-      else if (zone === dependency)
-        dependant.signal(error);
-    }
-    //self.close();
+  } else if (dependant.childOf(dependency)) {      
+    dependency._register(id, self, false);
+    dependant._register(id, self, true);
+    
+    self.signal = function(error) {
+      if (error) {
+        if (zone === dependant)
+          dependency.signal(error);
+        else if (zone === dependency)
+          dependant.signal(error);
+      }
+      //self.close();
+    };
+  } else {
+    throw new Error('Dependant zone is not a child of the dependency zone');
+  }
+  
+  self.call = function(function_, this_, arguments_) {
+    if (!zone)
+      zone = root;
+    if (zone !== dependency &&
+        !zone.childOf(dependency))
+      // TODO improve error message
+      throw new Error('This gate cannot be used from this zone');
+
+    dependant.call(function_, this_, arguments_);
   };
   
   self.schedule = function(function_, this_, arguments_) {
+    if (!zone)
+      zone = root;
+    if (zone !== dependency &&
+        !zone.childOf(dependency))
+      // TODO improve error message
+      throw new Error('This gate cannot be used from this zone');
+
     dependant.schedule(function_, this_, arguments_);
   };
   
   self.close = function() {
+    if (dependant === dependency)
+      return;
+      
     dependency._unregister(id);
     dependant._unregister(id);
   };
@@ -361,6 +389,83 @@ function Gate(dependency, fn) {
   
   dependency.call(fn, this);
 }
+
+
+function EventEmitter() {
+  // Capture the zone in which this EE got constructed.
+  var self = this;
+  var zone = global.zone;
+  
+  var listeners = Object.create(null);
+  
+  self.addListener = Gate(zone, function(event, callback) {
+    var gate = this;
+    gate.callback = callback;
+    gate.once = false;
+    
+    if (listeners[event] === undefined)
+      listeners[event] = [];
+      
+    listeners[event].push(gate);
+  });
+  
+  self.on = self.addListener;
+  
+  self.once = Gate(zone, function(event, callback) {
+    var gate = this;
+    gate.callback = callback;
+    gate.once = true;
+    
+    if (listeners[event] === undefined)
+      listeners[event] = [];
+      
+    listeners[event].push(gate);
+  });
+  
+  self.removeListener = function(event, callback) {
+    var list = listeners[event];
+    
+    for (var i = 0; i < list.length; i++) {
+      var gate = list[i];
+      
+      if (gate.callback === callback) {
+        gate.close();
+        list.splice(i, 1);
+        break;
+      }
+    }
+  };
+  
+  self.emit = function(event) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    
+    var list = (listeners[event] || []).slice();
+
+    for (var i = 0; i < list.length; i++) {
+      var gate = list[i];
+        
+      // TODO: it'd be better if any evnet that crosses zone boundaries is always made async?
+      gate.call(gate.callback, null, args);
+      
+      if (gate.once)
+        self.removeListener(event, gate.callback);
+    }
+  }
+  
+  self.removeAllListeners = function(event) {
+    if (event === undefined) {
+      for (event in listeners)
+        self.removeAllListeners(event);
+      return;
+    }
+    
+   var list = listeners[event];
+   
+   for (var i = 0; i < list.length; i++)
+     self.removeListener(list[i].callback);
+  };
+}
+
 
 new Zone(function RootZone() {
   root = this;
@@ -468,3 +573,14 @@ new Zone(function RootZone() {
   });
 });
 
+new Zone(function() {
+  var ee = new EventEmitter();
+  
+  new Zone(function() {
+    ee.on('test', function() {
+      console.log('bla');
+    });
+  });
+  
+  ee.emit('test');
+});
