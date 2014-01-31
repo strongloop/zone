@@ -28,7 +28,12 @@ function createBoundZoneConstructor(body, options, callback) {
     return new Zone(wrappedBody, options, callback);
   }
 }
-  
+
+/*
+ * - body: runs in zone
+ * - options: optional, none (TBD)
+ * - callback: optional, alternative to setCallback()
+ */
 function Zone(body, options, callback) {
   assert(typeof body === 'function');
 
@@ -165,7 +170,7 @@ function Zone(body, options, callback) {
   }
   
   function finalize() {
-    assert(enterCount === 0);
+    assert.equal(enterCount, 0);
     assert(!scheduled);
     
     assert(closed === true);
