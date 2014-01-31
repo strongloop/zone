@@ -192,6 +192,8 @@ function Zone(body, options, callback) {
       throw error;
     }
   }
+
+  self.root = root;
    
   self.return = function() {
     if (error)
