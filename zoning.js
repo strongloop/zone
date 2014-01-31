@@ -60,7 +60,7 @@ function Zone(body, options, callback) {
   var result = undefined;
   var error = undefined;
   
-  var children = Object.create(null);
+  var children = Object.create(null); // So they don't have base Object as prototype?
   var refs = Object.create(null);
   var sentSignals = Object.create(null);
   
@@ -485,12 +485,18 @@ function EventEmitter() {
 
 
 new Zone(function RootZone() {
-  root = this;
+  root = this; // XXX(sam) How is root tracking really supposed to work?
   
   // Hook process.setTimeout
   var realSetTimeout = global.setTimeout;
   var realClearTimeout = global.clearTimeout;
-  
+
+  // XXX(sam) I'm not sure this API will work. It means that in this
+  // 'wrapped ctor returning mode' that the wrapper already knows what zone its
+  // in, is that the case? Shouldn't it capture the 'current zone at time of
+  // call'? Which starts to sound a lot like the domain stack.
+  //
+  // Comment applies to the zstat below, as well.
   global.setTimeout = Gate(root, function(cb, timeout) {
     var gate = this;
     
