@@ -199,8 +199,7 @@ function Zone(body, options, callback) {
     else if (result)
       return void self.throw(new Error('Zone result already set.'));
     
-    self.result = Array.prototype.slice.call(arguments);
-    
+    result = Array.prototype.slice.call(arguments);
     self.schedule();
   };
   
