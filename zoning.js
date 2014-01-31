@@ -30,12 +30,14 @@ function createBoundZoneConstructor(body, options, callback) {
 }
   
 function Zone(body, options, callback) {
+  assert(typeof body === 'function');
+
   if (callback === undefined && typeof options === 'function') {
      callback = options;
      options = undefined;
   }
   
-  if (options === null)
+  if (options == null)
     options = {};
   
   if (callback == null)
