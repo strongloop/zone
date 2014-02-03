@@ -213,6 +213,13 @@ function Zone(body, options, callback) {
     
     self.schedule();
   }
+
+  self.callback = function(error_) {
+    if(error_)
+      return self.throw(error_);
+    return self.return.apply(
+      null, Array.prototype.slice.apply(arguments, 1));
+  }
   
   self.signal = function(error) {
     self.onsignal(error);
