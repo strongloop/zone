@@ -1,3 +1,5 @@
+exports.Zone = Zone;
+exports.Gate = Gate;
 
 var assert = require('assert');
 
@@ -28,14 +30,21 @@ function createBoundZoneConstructor(body, options, callback) {
     return new Zone(wrappedBody, options, callback);
   }
 }
-  
+
+/*
+ * - body: runs in zone
+ * - options: optional, none (TBD)
+ * - callback: optional, alternative to setCallback()
+ */
 function Zone(body, options, callback) {
+  assert(typeof body === 'function');
+
   if (callback === undefined && typeof options === 'function') {
      callback = options;
      options = undefined;
   }
   
-  if (options === null)
+  if (options == null)
     options = {};
   
   if (callback == null)
@@ -51,7 +60,7 @@ function Zone(body, options, callback) {
   var result = undefined;
   var error = undefined;
   
-  var children = Object.create(null);
+  var children = Object.create(null); // So they don't have base Object as prototype?
   var refs = Object.create(null);
   var sentSignals = Object.create(null);
   
@@ -163,7 +172,7 @@ function Zone(body, options, callback) {
   }
   
   function finalize() {
-    assert(enterCount === 0);
+    assert.equal(enterCount, 0);
     assert(!scheduled);
     
     assert(closed === true);
@@ -185,6 +194,8 @@ function Zone(body, options, callback) {
       throw error;
     }
   }
+
+  self.root = root;
    
   self.return = function() {
     if (error)
@@ -192,8 +203,7 @@ function Zone(body, options, callback) {
     else if (result)
       return void self.throw(new Error('Zone result already set.'));
     
-    self.result = Array.prototype.slice.call(arguments);
-    
+    result = Array.prototype.slice.call(arguments);
     self.schedule();
   };
   
@@ -205,6 +215,13 @@ function Zone(body, options, callback) {
     error = error_;
     
     self.schedule();
+  }
+
+  self.callback = function(error_) {
+    if(error_)
+      return self.throw(error_);
+    return self.return.apply(
+      null, Array.prototype.slice.apply(arguments, 1));
   }
   
   self.signal = function(error) {
@@ -468,12 +485,18 @@ function EventEmitter() {
 
 
 new Zone(function RootZone() {
-  root = this;
+  root = this; // XXX(sam) How is root tracking really supposed to work?
   
   // Hook process.setTimeout
   var realSetTimeout = global.setTimeout;
   var realClearTimeout = global.clearTimeout;
-  
+
+  // XXX(sam) I'm not sure this API will work. It means that in this
+  // 'wrapped ctor returning mode' that the wrapper already knows what zone its
+  // in, is that the case? Shouldn't it capture the 'current zone at time of
+  // call'? Which starts to sound a lot like the domain stack.
+  //
+  // Comment applies to the zstat below, as well.
   global.setTimeout = Gate(root, function(cb, timeout) {
     var gate = this;
     
@@ -536,51 +559,57 @@ new Zone(function RootZone() {
       gate.close();
     });
   });
-  
-  new Zone(function outer_zone() {
-    console.log('Beginning zone %s', zone.name);
-    
-    var n = 5;
-    var iv = setInterval(function() {
-      console.log('setInterval callback in zone %s. Left: %s', zone.name, n--);
-      if (n === 0)
-        clearInterval(iv);
-    }, 500);
-    
-    new Zone(function inner_zone() {
+
+  require('fs').zstat = stat;
+
+  if (module.main === module.filename) {
+    new Zone(function outer_zone() {
       console.log('Beginning zone %s', zone.name);
-      setTimeout(function() {
-        console.log('setTimeout callback in zone %s', zone.name);
-      }, 1000);
-    }).setCallback(function(error) {
-      console.log('Zone inner_zone ended, back in %s. Error: ', zone.name, error);
-    });
-    
-    new Zone(function stat_zone() {
-      stat('bla', function(error, stats) {
-        console.log('stat() callback in zone %s. (error, result) = (%s, %s)', zone.name, error, stats);
-        if (error) 
-          throw error;
+
+      var n = 5;
+      var iv = setInterval(function() {
+        console.log('setInterval callback in zone %s. Left: %s', zone.name, n--);
+        if (n === 0)
+          clearInterval(iv);
+      }, 500);
+
+      new Zone(function inner_zone() {
+        console.log('Beginning zone %s', zone.name);
+        setTimeout(function() {
+          console.log('setTimeout callback in zone %s', zone.name);
+        }, 1000);
+      }).setCallback(function(error) {
+        console.log('Zone inner_zone ended, back in %s. Error: ', zone.name, error);
       });
-    }).setCallback(function(error) {
-      console.log('Zone stat_zone ended, back in %s. Error: %s', zone.name, error);
+
+      new Zone(function stat_zone() {
+        stat('bla', function(error, stats) {
+          console.log('stat() callback in zone %s. (error, result) = (%s, %s)', zone.name, error, stats);
+          if (error) 
+            throw error;
+        });
+      }).setCallback(function(error) {
+        console.log('Zone stat_zone ended, back in %s. Error: %s', zone.name, error);
+        if (error) throw error;
+      });
+
+    }).setCallback(function(error, result) {
+      console.log('Zone outer_zone ended, back in %s. Error: %s', zone.name, error);
       if (error) throw error;
     });
-    
-  }).setCallback(function(error, result) {
-    console.log('Zone outer_zone ended, back in %s. Error: %s', zone.name, error);
-    if (error) throw error;
-  });
+  }
 });
 
-new Zone(function() {
-  var ee = new EventEmitter();
-  
+if (module.main === module.filename) {
   new Zone(function() {
-    ee.on('test', function() {
-      console.log('bla');
+    var ee = new EventEmitter();
+
+    new Zone(function() {
+      ee.on('test', function() {
+        console.log('bla');
+      });
     });
+
+    ee.emit('test');
   });
-  
-  ee.emit('test');
-});
+}
