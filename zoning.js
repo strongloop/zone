@@ -549,6 +549,8 @@ new Zone(function RootZone() {
       gate.close();
     });
   });
+
+  require('fs').zstat = stat;
   
   new Zone(function outer_zone() {
     console.log('Beginning zone %s', zone.name);
