@@ -3,7 +3,7 @@ var net = require('net');
 var z = require('./');
 var EventEmitter = require('events').EventEmitter;
 
-var debug = process.env.DEBUG||true ? console.log : function(){};
+var debug = process.env.DEBUG || true ? console.log : function() {};
 
 debug('Start');
 
@@ -112,7 +112,7 @@ function slice() {
 }
 
 function End() {
-  if(!calledBack) {
+  if (!calledBack) {
     console.log('... did not call back!');
   }
   console.log('End');
