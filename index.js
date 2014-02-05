@@ -1,2 +1,2 @@
 
-module.exports = require('./lib/zone.js');
+module.exports = require('./lib/setup.js');
