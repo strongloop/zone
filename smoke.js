@@ -2,6 +2,7 @@
 require('./index.js'); // zone
 var Zone = zone.Zone, Gate = zone.Gate;
 
+var assert = require('assert');
 var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
@@ -26,7 +27,9 @@ new Zone(function outer_zone() {
   });
 
   new Zone(function stat_zone() {
+    var statZone = this;
     fs.stat('bla', function(error, stats) {
+      assert.strictEqual(zone, statZone);
       console.log('stat() callback in zone %s. (error, result) = (%s, %s)', zone.name, error, stats);
       if (error)
         throw error;
