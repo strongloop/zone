@@ -61,7 +61,7 @@ global.clearInterval = function(gate) {
 
 // Hook fs.stat
 var realStat = require('fs').stat;
-var stat = Gate(zone.root, function(file, cb) {
+var stat = Gate(function(file, cb) {
   var gate = this;
   realStat(file, function(err, stats) {
     gate.schedule(function() {
