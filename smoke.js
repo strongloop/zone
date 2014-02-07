@@ -4,61 +4,6 @@ var Zone = zone.Zone, Gate = zone.Gate;
 
 var EventEmitter = require('events').EventEmitter;
 
-// Hook process.setTimeout
-var realSetTimeout = global.setTimeout;
-var realClearTimeout = global.clearTimeout;
-
-global.setTimeout = Gate(zone.root, function(cb, timeout) {
-  var gate = this;
-
-  var handle = realSetTimeout(function() {
-    gate.schedule(cb);
-    gate.close();
-    handle = null;
-  }, timeout);
-
-  gate.clear = function() {
-    if (!handle)
-      return;
-    realClearTimeout(handle);
-    gate.close();
-    handle = null;
-  };
-});
-
-global.clearTimeout = function(gate) {
-  gate.clear();
-};
-
-// Hook process.setInterval
-var realSetInterval = global.setInterval;
-var realClearInterval = global.clearInterval;
-
-global.setInterval = Gate(zone.root, function(cb, interval) {
-  var gate = this;
-
-  var handle = realSetInterval(function() {
-    gate.schedule(cb);
-  }, interval);
-
-  gate.clear = function() {
-    if (!handle)
-      return;
-
-    // Calling realClearTimeout may seem wrong here but
-    // timers.js has some weirdness going on that makes this right.
-    handle._repeat = false;
-    realClearTimeout(handle);
-
-    gate.close();
-    handle = null;
-  };
-});
-
-global.clearInterval = function(gate) {
-  gate.clear();
-};
-
 // Hook fs.stat
 var realStat = require('fs').stat;
 var stat = Gate(function(file, cb) {
