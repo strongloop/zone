@@ -1,12 +1,17 @@
 
 require('./index.js'); // zone
 
+
 var assert = require('assert');
 var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 var Gate = zone.Gate;
 var Zone = zone.Zone;
 
+(function() {
+  var wtf = this instanceof Zone;
+  assert(!wtf);
+})();
 
 new Zone(function outer_zone() {
   console.log('Beginning zone %s', zone.name);
