@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tap --stderr --tap test.js",
+    "start": "NODE_DEBUG=test nodemon --exec \"npm test\" -e \"js\""
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/strongloop/zone/issues"
   },
-  "homepage": "https://github.com/strongloop/zone"
+  "homepage": "https://github.com/strongloop/zone",
+  "devDependencies": {
+    "tap": "~0.4.8",
+    "debuglog": "~1.0.0"
+  }
 }
