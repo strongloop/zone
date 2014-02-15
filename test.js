@@ -77,7 +77,6 @@ tap.test('zone can return values', function(t) {
   }, returns3(t, 'hi'));
 });
 
-
 function returns3(t, res, etc) {
   etc = etc || [];
 
@@ -89,6 +88,21 @@ function returns3(t, res, etc) {
   };
 }
 
+tap.test('zones catch direct errors', function(t) {
+  t.plan(2);
+
+  new zone.Zone(function() {
+    throw Error('bye');
+  }, errors2(t, 'bye'));
+});
+
+function errors2(t, emsg) {
+  return function(err_) {
+    t.equal(err_.message, emsg);
+    t.equal(arguments.length, 1);
+  };
+}
+
 function slice() {
   var aray = arguments[0];
   var args = Array.prototype.slice.call(arguments, 1);
@@ -97,20 +111,10 @@ function slice() {
 
 /*
 
-tap.test('zones catch direct errors', function(t) {
-
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
-      throw Error('bye');
-    }, Should(t, 'error'), undefined, Error('bye'));
-  });
-
-});
-
 tap.test('zones catch indirect errors', function(t) {
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
       process.nextTick(function() {
         throw Error('bye');
       });
@@ -121,8 +125,8 @@ tap.test('zones catch indirect errors', function(t) {
 
 tap.test('zones catch error events', function(t) {
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
       var ee = new EventEmitter();
       process.nextTick(function() {
         ee.emit('error', Error('bye'));
@@ -134,8 +138,8 @@ tap.test('zones catch error events', function(t) {
 
 tap.test('zones wait for handles', function(t) {
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
       var ee = net.createServer().listen(0);
       this.throw(Error('bye'));
       setTimeout(function() {
@@ -149,8 +153,8 @@ tap.test('zones wait for handles', function(t) {
 
 tap.test('nested zone w/fs.zstat:', function(t) {
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
       fs.zstat('.', this.callback);
     }, Should(t, 'result in stat'));
   });
@@ -159,8 +163,8 @@ tap.test('nested zone w/fs.zstat:', function(t) {
 
 tap.test('nested zone w/setTimeout direct cb:', function(t) {
 
-  new z.Zone(function notreallyroot() {
-    var _ = new z.Zone(function myzone() {
+  new zone.Zone(function notreallyroot() {
+    var _ = new zone.Zone(function myzone() {
       setTimeout(function() {
         zone.return('ok');
       }, 1);
@@ -171,8 +175,8 @@ tap.test('nested zone w/setTimeout direct cb:', function(t) {
 
 tap.test('nested zone w/setTimeout indirect cb:', function(t) {
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
       setTimeout(function() {
         // XXX this is bound to gate's 'outside' zone, but since this is lost if
         // callback is cb.bind(<someobj>), and since this is also lost if you call
