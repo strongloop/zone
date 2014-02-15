@@ -1,0 +1,71 @@
+/*
+tap.test('zones catch error events', function(t) {
+
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
+      var ee = new EventEmitter();
+      process.nextTick(function() {
+        ee.emit('error', Error('bye'));
+      });
+    }, Should(t, 'error'));
+  });
+
+});
+
+tap.test('zones wait for handles', function(t) {
+
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
+      var ee = net.createServer().listen(0);
+      this.throw(Error('bye'));
+      setTimeout(function() {
+        ee.close();
+        this.return('will be overriden by error');
+      }, 100);
+    }, Should(t, 'error'));
+  });
+
+});
+
+tap.test('nested zone w/fs.zstat:', function(t) {
+
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
+      fs.zstat('.', this.callback);
+    }, Should(t, 'result in stat'));
+  });
+
+});
+
+tap.test('nested zone w/setTimeout direct cb:', function(t) {
+
+  new zone.Zone(function notreallyroot() {
+    var _ = new zone.Zone(function myzone() {
+      setTimeout(function() {
+        zone.return('ok');
+      }, 1);
+    }, Should(t, 'result in ok'));
+  });
+
+});
+
+tap.test('nested zone w/setTimeout indirect cb:', function(t) {
+
+  new zone.Zone(function() {
+    var _ = new zone.Zone(function() {
+      setTimeout(function() {
+        // XXX this is bound to gate's 'outside' zone, but since this is lost if
+        // callback is cb.bind(<someobj>), and since this is also lost if you call
+        // a helper function, I think there should be a 'current zone' globally
+        // somewhere
+        var zone = this;
+        function doIt() {
+          zone.return('ok');
+        }
+        doIt();
+      }, 1);
+    }, Should(t, 'result in ok'));
+  });
+});
+
+*/
