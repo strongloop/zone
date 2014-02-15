@@ -8,6 +8,16 @@ tap.test('zone can return values', function(t) {
   }, returns3(t, 'hi'));
 });
 
+tap.test('zone can return value in timeout', function(t) {
+  t.plan(3);
+
+  new zone.Zone(function myzone() {
+    setTimeout(function() {
+      zone.return('ok');
+    }, 1);
+  }, returns3(t, 'ok'));
+});
+
 tap.test('zone can return multiple values', function(t) {
   t.plan(3);
 
