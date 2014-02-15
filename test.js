@@ -5,10 +5,6 @@ var fs = require('fs');
 var net = require('net');
 var EventEmitter = require('events').EventEmitter;
 
-var debug = tap.log;
-
-debug('zone:', zone);
-
 var ROOT = zone;
 
 function isZone5(t, z, root, parent, name) {
@@ -72,17 +68,34 @@ tap.test('zone properties after creating', function(t) {
   t.end();
 });
 
-/*
 
 tap.test('zone can return values', function(t) {
+  t.plan(3);
 
-  new z.Zone(function() {
-    var _ = new z.Zone(function() {
-      zone.return('hi');
-    }, Should(t, 'result in hi', 'hi'));
-  });
-
+  new zone.Zone(function() {
+    zone.return('hi');
+  }, returns3(t, 'hi'));
 });
+
+
+function returns3(t, res, etc) {
+  etc = etc || [];
+
+  return function(err_, res_) {
+    var etc_ = slice(arguments, 2);
+    t.equal(err_, null);
+    t.deepEqual(res_, res);
+    t.deepEqual(etc_, etc);
+  };
+}
+
+function slice() {
+  var aray = arguments[0];
+  var args = Array.prototype.slice.call(arguments, 1);
+  return Array.prototype.slice.apply(aray, args);
+}
+
+/*
 
 tap.test('zones catch direct errors', function(t) {
 
@@ -126,7 +139,6 @@ tap.test('zones wait for handles', function(t) {
       var ee = net.createServer().listen(0);
       this.throw(Error('bye'));
       setTimeout(function() {
-        debug('Release zone');
         ee.close();
         this.return('will be overriden by error');
       }, 100);
@@ -176,21 +188,4 @@ tap.test('nested zone w/setTimeout indirect cb:', function(t) {
   });
 });
 
-function slice() {
-  var aray = arguments[0];
-  var args = Array.prototype.slice.call(arguments, 1);
-  return Array.prototype.slice.apply(aray, args);
-}
 */
-
-function Should(t, name) {
-  return function() {
-    calledBack = true;
-    var err = arguments[0];
-    var res = arguments[1];
-    var etc = slice(arguments, 2);
-    tap.log('callback should %s: err<%s>, result<%s>, ...:',
-      name, err && err.message, res, etc);
-    t.end();
-  };
-}
