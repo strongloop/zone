@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tap --stderr --tap tests",
+    "test": "tap --stderr --tap --timeout=2 tests",
     "start": "NODE_DEBUG=test nodemon --exec \"npm test\" -e \"js\""
   },
   "repository": {
