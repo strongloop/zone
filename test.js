@@ -25,17 +25,50 @@ tap.test('root zone', function(t) {
   t.is(zone.id, 1);
 });
 
-tap.test('new zone', function(t) {
-  t.plan(5+3);
-  var inside;
-  var outside = new zone.Zone(function() {
-    isZone5(t, zone, ROOT, ROOT, 'Anonymous');
-    inside = zone;
-    t.not(zone, ROOT);
-  });
-  t.is(inside, outside);
-  t.is(zone, ROOT);
+tap.test('zone properties after creating', function(t) {
+  function testCreateZone(description, ctor) {
+    tap.test(description, function (t) {
+      t.plan(5+3);
+      var inside;
+      var outside = ctor(function() {
+        isZone5(t, zone, ROOT, ROOT, ctor.expectedName);
+        inside = zone;
+        t.not(zone, ROOT);
+      });
+      t.is(inside, outside);
+      t.is(zone, ROOT);
 
+      t.end();
+    });
+  }
+
+  testCreateZone('new anonymous zone', function ctor(callback) {
+    ctor.expectedName = 'Anonymous';
+    return new zone.Zone(function() {
+      return  callback();
+    });
+  });
+
+  testCreateZone('wrapped anonymous zone', function ctor(callback) {
+    ctor.expectedName = 'Anonymous';
+    return zone.Zone(function() {
+      return callback();
+    })();
+  });
+
+  testCreateZone('new named zone', function ctor(callback) {
+    ctor.expectedName = 'myName';
+    return new zone.Zone(function myName() {
+      return callback();
+    });
+  });
+
+  testCreateZone('wrapped named zone', function ctor(callback) {
+    ctor.expectedName = 'myName';
+    return zone.Zone(function myName() {
+      return callback();
+    })();
+  });
   t.end();
 });
 
