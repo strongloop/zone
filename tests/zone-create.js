@@ -11,14 +11,14 @@ function isZone5(t, z, root, parent, name) {
 }
 
 tap.test('root zone', function(t) {
-  t.plan(5+1);
+  t.plan(5 + 1);
   isZone5(t, zone, zone, null, 'Root');
   t.is(zone.id, 1);
 });
 
 function testCreateZone(description, ctor) {
-  tap.test(description, function (t) {
-    t.plan(5+3);
+  tap.test(description, function(t) {
+    t.plan(5 + 3);
     var inside;
     var outside = ctor(function() {
       isZone5(t, zone, ROOT, ROOT, ctor.expectedName);
@@ -35,7 +35,7 @@ function testCreateZone(description, ctor) {
 testCreateZone('new anonymous zone', function ctor(callback) {
   ctor.expectedName = 'Anonymous';
   return new zone.Zone(function() {
-    return  callback();
+    return callback();
   });
 });
 

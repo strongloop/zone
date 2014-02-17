@@ -17,8 +17,8 @@ tap.test('zones wait for handles', function(t) {
 });
 
 tap.test('zones catch error events', function(t) {
-  t.ok(false, '# TODO')
-  t.end()
+  t.ok(false, '# TODO');
+  t.end();
   return; // the error event just kills tap :-(
 
   new zone.Zone(function() {
