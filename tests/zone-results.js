@@ -34,15 +34,14 @@ tap.test('zones catch direct errors', function(t) {
   }, errors2(t, 'bye'));
 });
 
-/*
 tap.test('zones catch indirect errors', function(t) {
+  t.plan(2);
   new zone.Zone(function() {
     process.nextTick(function() {
       throw Error('bye');
     });
   }, errors2(t, 'bye'));
 });
-*/
 
 function returns3(t, res, etc) {
   etc = etc || [];
