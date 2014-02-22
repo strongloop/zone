@@ -44,8 +44,6 @@ tap.test('smoke test', function(t) {
     if (error) throw error;
   });
 
-  /* XXX(sam) doesn't pass with EventEmitter patching, and the EventEmitter
-   * breaks node-tap... consider it a use-case :-)
   new Zone(function() {
     var ee = new EventEmitter();
 
@@ -57,7 +55,6 @@ tap.test('smoke test', function(t) {
 
     ee.emit('test');
   });
-   */
 
   t.end();
 });
