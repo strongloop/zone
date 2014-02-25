@@ -3,7 +3,7 @@ var tap = require('./tap');
 tap.test('zone can return values', function(t) {
   t.plan(3);
 
-  new zone.Zone(function() {
+  new zone.Zone(function returningZone() {
     zone.return('hi');
   }, returns3(t, 'hi'));
 });
@@ -11,7 +11,7 @@ tap.test('zone can return values', function(t) {
 tap.test('zone can return value in timeout', function(t) {
   t.plan(3);
 
-  new zone.Zone(function myzone() {
+  new zone.Zone(function timeoutReturningZone() {
     setTimeout(function() {
       zone.return('ok');
     }, 1);
@@ -21,7 +21,7 @@ tap.test('zone can return value in timeout', function(t) {
 tap.test('zone can return multiple values', function(t) {
   t.plan(3);
 
-  new zone.Zone(function() {
+  new zone.Zone(function multipleResultZone() {
     zone.return('hi', 'bert');
   }, returns3(t, 'hi', ['bert']));
 });
@@ -29,14 +29,14 @@ tap.test('zone can return multiple values', function(t) {
 tap.test('zones catch direct errors', function(t) {
   t.plan(2);
 
-  new zone.Zone(function() {
+  new zone.Zone(function directCatchingZone() {
     throw Error('bye');
   }, errors2(t, 'bye'));
 });
 
 tap.test('zones catch indirect errors', function(t) {
   t.plan(2);
-  new zone.Zone(function() {
+  new zone.Zone(function indirectCatchingZone() {
     process.nextTick(function() {
       throw Error('bye');
     });
