@@ -44,10 +44,10 @@ tap.test('smoke test', function(t) {
     if (error) throw error;
   });
 
-  new Zone(function() {
+  new Zone(function EventEmitterTestOuterZone() {
     var ee = new EventEmitter();
 
-    new Zone(function() {
+    new Zone(function EventEmitterTestInnerZone() {
       ee.on('test', function() {
         tap.log('bla');
       });
