@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/strongloop/zone",
   "devDependencies": {
-    "tap": "git://github.com/strongloop/node-tap#zoneified",
-    "debuglog": "~1.0.0"
+    "tap": "git://github.com/strongloop/node-tap#zoneified"
   }
 }
