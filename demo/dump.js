@@ -23,8 +23,7 @@ function dumpNext() {
   if (!pipeName)
     return;
 
-  var conn = net.connect(pipeName, { allowHalfOpen: true });
-  conn.end();
+  var conn = net.connect(pipeName);
   conn.pipe(process.stdout);
   conn.on('error', function() {});
   conn.on('close', dumpNext);
