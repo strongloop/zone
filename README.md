@@ -128,7 +128,10 @@ new Zone(function MyZone() {
 });
 ```
 
-Or as a co-style generator. This is currently completely unimplemented.
+## Co-style generators
+
+You can also obtain the result value of a zone by yielding it.
+(This is currently unimplemented)
 
 ```js
 try {
@@ -136,13 +139,11 @@ try {
     // Do whatever
   });
 
-  // If we get here it all worked
+  // If we get here it all worked.
 } catch (err) {
   // The zone failed.
 }
 ```
-
-## Co-style generators
 
 Instead of passing a normal function as the zone 'body', the user can
 pass a generator constructor. This lets the user use the yield keyword
@@ -154,6 +155,41 @@ new Zone(function* MyZone() {
   var stats = yield fs.stat('/foo/bar');
 });
 ```
+
+### Zone vs try...catch
+
+When using co-style generators, the ordinary `try..catch` statement becomes a
+lot more useful, and their purpose overlaps with that of zones. But there are
+also differences:
+
+```js
+try {
+  var connection = net.connect('http://invalid.url'); // no yield
+  var fd = yield fs.open('/file/that/exists');
+  var fd2 = yield fs.open('/file/that/does/not/exist');
+} catch (err) {
+  // * The invalid url doesn't cause an error here because the promise isn't
+  //   yield-ed.
+  // * The attempt to open a nonexisting file failed and got us here.
+  // * The file that was successfully opened is still open.
+}
+```
+
+Contrast this to:
+
+```js
+new Zone(function*() {
+  var connection = net.connect('http://invalid.url');
+  var fd = yield fs.open('/file/that/exists');
+  var fd2 = yield fs.open('/file/that/does/not/exist');
+}).catch((err) => {
+  // * Either the failed connection attempt, or the nonexisting file
+  //  (whichever happened first) made the zone fail.
+  // * The zone has automatically closed the file that was succesfully
+  //   opened before invoking the catch handler.
+});
+```
+
 
 ## Exiting a zone
 
