@@ -13,12 +13,12 @@ new Zone(function server_zone() {
 
 for (var i = 0; i < 10; i++) {
   new Zone(function connection_zone() {
-    net.connect(3000, function() {
-      var conn = this;
-
-      setInterval(function() {
-        conn.write('hello');
-      }, 1000);
+    var conn = net.connect(3000, function() {
+      new Zone(function interval_zone() {
+        setInterval(function() {
+          conn.write('hello');
+        }, 1);
+      });
     });
   }).setCallback(function(error) {
   });
