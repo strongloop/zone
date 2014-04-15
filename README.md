@@ -563,6 +563,7 @@ Returns a curried zone constructor.
 ### `Zone#apply(thisObj, fn, arguments)`
 ### `Zone#applyUnsafe(thisObj, fn, arguments)`
 ### `Zone#applyAsync(thisObj, fn, arguments)`
+### `Zone#schedule(fn, [args...])`
 
 Synchronously call a function inside a zone. This function throws if the target
 zone is not an ancestor of the target zone.
@@ -589,6 +590,8 @@ These functions all do similar things.
 
   * `apply`, `applyUnsafe` and `applyAsync` let you specify the value for `this` in the function invoked.
     The third arguments should be an array or array-like object which contains a list of arguments for that function.
+
+  * `schedule` is an alias for `runAsync`.
 
 ### `Zone#schedule(fn, [args...])`
 
@@ -667,14 +670,14 @@ Closes the gate. After this the zone that created the Gate can exit again.
 No calls to `run`, `schedule` etc are allowed after closing a gate.
 
 ### `Gate#run(fn, [args...])`
-### `Gate#runUnsafe(fn, [args...])`
-### `Gate#runAsync(fn, [args])`
+### `Gate#runAsync(fn, [args...])`
 ### `Gate#call(thisObj, fn, [args...])`
-### `Gate#callUnsafe(thisObj, fn, [args...])`
 ### `Gate#callAsync(thisObj, fn, arguments)`
 ### `Gate#apply(thisObj, fn, arguments)`
-### `Gate#applyUnsafe(thisObj, fn, arguments)`
 ### `Gate#applyAsync(thisObj, fn, arguments)`
+### `Gate#schedule(fn, [args...])`
 
 Use the gate to execute a function in the context of the creator zone.
 See the equivalent Zone class methods.
+
+Gates don't offer the `...Unsafe` class of invocation methods.
