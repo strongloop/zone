@@ -1,7 +1,7 @@
 var tap = require('./tap');
 var fs = require('fs');
 
-if(true) {
+if (true) {
   tap.test('fs.stat', function(t) {
     new zone.Zone(function() {
       fs.stat('.', zone.callback);
@@ -13,7 +13,7 @@ if(true) {
 
   tap.test('setTimeout callback is optional', function(t) {
     new zone.Zone(function() {
-      setTimeout(null,100);
+      setTimeout(null, 100);
     }, function(err) {
       t.equal(err, null);
       t.end();
@@ -21,13 +21,13 @@ if(true) {
   });
 }
 
-if(false) {
+if (false) {
   tap.test('setTimeout callback is optional but delays zone close', function(t) {
     // Demonstrate that even without a timer callback, a zone doesn't complete
     // until the timer completes.
     var timer;
     new zone.Zone(function() {
-      timer = setTimeout(null,100);
+      timer = setTimeout(null, 100);
       console.log('timer:', timer);
       t.ok(timer._idleNext);
       // XXX(sam) Fails, wrapped gates return the gate... this isn't good, the
@@ -41,12 +41,12 @@ if(false) {
   });
 }
 
-if(true) {
+if (true) {
   tap.test('fs.stat callback is optional', function(t) {
     new zone.Zone(function() {
       fs.stat('.');
     }, function(err) {
-      if(err)
+      if (err)
         throw err;
       t.end();
     });
@@ -54,7 +54,7 @@ if(true) {
 }
 
 
-if(true) {
+if (true) {
   tap.test('open sync fds are closed by zones', function(t) {
     t.plan(2);
 
@@ -86,7 +86,7 @@ if(true) {
   });
 }
 
-if(true) {
+if (true) {
   tap.test('open fds are closed by zones', function(t) {
     t.plan(2);
 
