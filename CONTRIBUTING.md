@@ -25,17 +25,22 @@ Contributing to zones is easy. In a few simple steps:
 
 ### Signing patches ###
 
-By signing off your patches you show us that you are making your
-contribution available under terms of the [Contributor License
-Agreement](contributor-license-agreement).
+To clarify the intellectual property license for the contributions from
+any individual who contributes to StrongLoop’s open source projects
+StrongLoop must have a Contributor License Agreement on file ensuring
+that each contributor has agreed to the necessary license terms. This
+license is for your protection as a contributor, as well as the
+protection of StrongLoop and its users.
 
-By doing so you are granting StrongLoop, inc. a license that allows us
-to publish your contribution under any license. When acceppted we'll
-typically make your work available under terms of the project's
-[license][], which is currently the Artistic License 2.0.
+The license does not change your rights to use your own contributions
+for any other purpose.
 
-To sign off a contribution, add the following line to the bottom of the
-commit message. Use your real name and an actual e-mail address.
+Please read the Contributor License Agreement carefully before signing
+and keep a copy for your records.
+
+To signify your agreement to these terms, add the following line to the
+bottom of your commit message. Use your real name and an actual e-mail
+address.
 
 ```
 Signed-off-by: Random J Developer <random@developer.example.org>
