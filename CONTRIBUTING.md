@@ -1,9 +1,4 @@
 
-### Important note ###
-
-*This document is a draft.* It is currently under legal review.
-
-
 ### Contributing ###
 
 Thank you for your interest in Zones, an open source project
