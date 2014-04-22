@@ -6,6 +6,9 @@
 
 ### Contributing ###
 
+Thank you for your interest in Zones, an open source project
+administered by StrongLoop.
+
 Contributing to zones is easy. In a few simple steps:
 
   * Ensure that you're not wasting your time by writing a patch that we
