@@ -1,47 +1,98 @@
-# Disclaimer
+# StrongLoop zone library
 
-The intended audience of this readme is developers who are interested
-in the rationale and internals of the zone library. It's rough but it specifies what we're building.
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+- [Overview](#overview)
+  - [Disclaimer](#disclaimer)
+- [Using zones](#using-zones)
+  - [Creating a zone](#creating-a-zone)
+    - [The curried constructor](#the-curried-constructor)
+  - [Obtaining the result of a zone](#obtaining-the-result-of-a-zone)
+    - [Co-style generators](#co-style-generators)
+    - [Zone vs try...catch](#zone-vs-trycatch)
+  - [Exiting a zone](#exiting-a-zone)
+  - [Sharing resources between zones](#sharing-resources-between-zones)
+  - [The rules of engagement](#the-rules-of-engagement)
+  - [Zone.data](#zonedata)
+  - [Bookkeeping within a zone](#bookkeeping-within-a-zone)
+  - [Reference counting](#reference-counting)
+  - [Cleanup procedure](#cleanup-procedure)
+- [Gates](#gates)
+  - [Gate example](#gate-example)
+  - [Gate constructor](#gate-constructor)
+  - [The curried gate constructor](#the-curried-gate-constructor)
+- [API reference](#api-reference)
+  - [`zone`](#zone)
+  - [`new Zone(bodyFn, [callback])`](#new-zonebodyfn-callback)
+  - [`zone.Zone(body)`](#zonezonebody)
+  - [`Zone#run(fn, [args...])`](#zone#runfn-args)
+  - [`Zone#runUnsafe(fn, [args...])`](#zone#rununsafefn-args)
+  - [`Zone#runAsync(fn, [args])`](#zone#runasyncfn-args)
+  - [`Zone#call(thisObj, fn, [args...])`](#zone#callthisobj-fn-args)
+  - [`Zone#callUnsafe(thisObj, fn, [args...])`](#zone#callunsafethisobj-fn-args)
+  - [`Zone#callAsync(thisObj, fn, arguments)`](#zone#callasyncthisobj-fn-arguments)
+  - [`Zone#apply(thisObj, fn, arguments)`](#zone#applythisobj-fn-arguments)
+  - [`Zone#applyUnsafe(thisObj, fn, arguments)`](#zone#applyunsafethisobj-fn-arguments)
+  - [`Zone#applyAsync(thisObj, fn, arguments)`](#zone#applyasyncthisobj-fn-arguments)
+  - [`Zone#schedule(fn, [args...])`](#zone#schedulefn-args)
+  - [`Zone#schedule(fn, [args...])`](#zone#schedulefn-args-1)
+  - [`Zone#setCallback(fn)`](#zone#setcallbackfn)
+  - [`Zone#then(successCallback, [errorCallback])`](#zone#thensuccesscallback-errorcallback)
+  - [`Zone#catch(errorCallback)`](#zone#catcherrorcallback)
+  - [`Zone#return([value])`](#zone#returnvalue)
+  - [`Zone#throw(error)`](#zone#throwerror)
+  - [`Zone#complete(err, [result])`](#zone#completeerr-result)
+  - [`Zone#parent`](#zone#parent)
+  - [`Zone#root`](#zone#root)
+  - [`Zone#data`](#zone#data)
+  - [`new Gate([fn], [ancestorZone])`](#new-gatefn-ancestorzone)
+  - [`Gate(fn, [ancestorZone])`](#gatefn-ancestorzone)
+  - [`Gate#close()`](#gate#close)
+  - [`Gate#run(fn, [args...])`](#gate#runfn-args)
+  - [`Gate#runAsync(fn, [args...])`](#gate#runasyncfn-args)
+  - [`Gate#call(thisObj, fn, [args...])`](#gate#callthisobj-fn-args)
+  - [`Gate#callAsync(thisObj, fn, arguments)`](#gate#callasyncthisobj-fn-arguments)
+  - [`Gate#apply(thisObj, fn, arguments)`](#gate#applythisobj-fn-arguments)
+  - [`Gate#applyAsync(thisObj, fn, arguments)`](#gate#applyasyncthisobj-fn-arguments)
+  - [`Gate#schedule(fn, [args...])`](#gate#schedulefn-args)
 
-It isn't particularly suited for end users at this point.
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Currently many things in this document are unimplemented, or implemented differently, or buggy. This document is authorative.
+## Overview
 
-So why read it anyway? Because it's the only documentation there is :)
-
-The library is also heavily under development, so we're very open to informed criticism.
-
-# Zones overview
-
-## Goal of zones
-
-Currently there are a couple of problems that make it really hard to
-reason about asynchronous control flow in node. To be specific:
+The StrongLoop Zone library addresses several issues in Node application development:
 
   * Stack traces are useless when an asynchronous function fails.
 
   * Asynchronous functions are hard to compose into more high-level APIs.
-    Imagine implementing a simple asynchronous API like `bar(arg1, arg2, cb)`
-    where `cb` is the error-first callback that the user of the API specifies.
-    To implement this correctly you must take care:
+    Imagine a simple asynchronous API like `bar(arg1, arg2, cb)`
+    where `cb` is the error-first callback function specified by the user.
+    To use this correctly you must:
 
-    - to always call the callback
-    - don't call the callback more than once
-    - don't synchronously throw and also call the callback
-    - don't call the callback synchronously
+    - Call the callback function exactly once (not more).
+    - Not throw an exception synchronously and also call the callback function.
+    - Not call the callback function synchronously.
 
-  * It is difficult to handle errors that are raised asynchronously.
-    Typically node will crash. If the uses chooses to ignore the error,
-    resources may leak.
-    Zones should make it easy to handle errors
-    and to avoid resource leaks.
+  * It is difficult to handle errors raised asynchronously.
+    Typically Node will crash. If the user ignores the error, the application may leak resources.
+    Zones make it easy to handle errors and avoid resource leaks.
 
-  * Sometimes there is a need to associate user data to an asynchronous flow.
-    There is currently no way to do this.
+  * Sometimes you need to associate user data to an asynchronous flow.
+    There is currently no way to do this.  
+
+### Disclaimer
+
+This README is intended for developers interested
+in the rationale and internals of the zone library. It's rough but it specifies what we're building.
+It isn't particularly suited for end users at this point.
+
+Currently many things in this document are unimplemented, or implemented differently, or buggy. 
+
+The library is also heavily under development, so we're very open to informed criticism.
 
 ## Using zones
 
-To use zones, the very first line of your program must read:
+To use zones, add the following as the very first line of your program:
 
 ```js
 require('zone');
@@ -54,7 +105,7 @@ are actually static methods of the `Zone` class, so they don't do anything
 with the currently active zone. After loading the zone library the
 program has entered the 'root' zone.
 
-## Creating a zone
+### Creating a zone
 
 There are a few different ways to create a zone. The canonical way to
 create a one-off zone is:
@@ -77,12 +128,51 @@ new Zone(function MyZone() {
 The zone constructor function is called synchronously.
 Of course zones can also be nested.
 
-## The end of a zone
+#### The curried constructor
+
+Under some circumstances it may be desirable to create a function that is always wrapped within a zone.
+The obvious way to do this:
+
+```js
+function renderTemplate(fileName, cb) {
+  new Zone(function() {
+    // Asynchronous unicorns and something with fileName.
+    ...
+  }).setCallback(cb);
+}
+```
+
+To make this a little less verbose the "curried constructor" makes it possible to call `zone.Zone`
+without the `new` keyword.  Doing so creates a new zone constructor that is
+pre-seeded with a body. Arguments passed to the constructor are
+forwarded to the body function. Example:
+
+
+```js
+var renderTemplate = Zone(function(fileName, cb) {
+  zone.setCallback(cb);
+  // Rainbow.
+  ...
+});
+```
+
+Now you can use this zone template as follows:
+
+```js
+renderTemplate('bar', function(err, result) {
+  if (err)
+    throw err;
+  // Do something with the result
+  ...
+});
+```
+
+### Obtaining the result of a zone
 
 Zones are like asynchronous functions. From the outside perspective,
 they can return a single value or "throw" a single error. There are a
 couple of ways the outside zone may obtain the result of a zone. When a
-zone reports it's outcome two things are ensured:
+zone reports its outcome:
 
   * No more callbacks will run inside the zone.
   * All non-garbage-collectable resources have been cleaned up.
@@ -116,7 +206,7 @@ new zone.Zone(function MyZone() {
 });
 ```
 
-A zone can be used as a promise too:
+You can use a zone can as a promise too:
 
 ```js
 new Zone(function MyZone() {
@@ -128,7 +218,7 @@ new Zone(function MyZone() {
 });
 ```
 
-## Co-style generators
+#### Co-style generators
 
 You can also obtain the result value of a zone by yielding it.
 (This is currently unimplemented)
@@ -145,10 +235,10 @@ try {
 }
 ```
 
-Instead of passing a normal function as the zone 'body', the user can
-pass a generator constructor. This lets the user use the yield keyword
+Instead of passing a normal function as the zone "body", you can
+pass a generator constructor. This lets you use the `yield` keyword
 within the zone body. Other than that, the zone behaves as if a normal
-function was passed.
+function were passed.
 
 ```js
 new Zone(function* MyZone() {
@@ -156,10 +246,10 @@ new Zone(function* MyZone() {
 });
 ```
 
-### Zone vs try...catch
+#### Zone vs try...catch
 
 When using co-style generators, the ordinary `try..catch` statement becomes a
-lot more useful, and their purpose overlaps with that of zones. But there are
+lot more useful, and its purpose overlaps with that of zones. But there are
 also differences:
 
 ```js
@@ -190,12 +280,11 @@ new Zone(function*() {
 });
 ```
 
-
-## Exiting a zone
+### Exiting a zone
 
 There are a few ways to explicitly exit a zone:
 
-* `zone.return(value)` sets the return value of the zone and starts cleanup
+* `zone.return(value)` sets the return value of the zone and starts cleanup.
 * `zone.throw(error)` sets the zone to failed state and starts cleanup. `zone.throw` itself does not throw, so statements after it will run.
 * `throw error` uses normal exception handling. If the exception is not caught before it reaches the binding layer, the active zone is set to failed state and starts cleanup.
 * `zone.complete(err, value)` is a zone-bound function that may be passed to subordinates to let them exit the zone.
@@ -221,9 +310,9 @@ new Zone(function StatZone() {
 });
 ```
 
-## Sharing resources between zones
+### Sharing resources between zones
 
-Within a zone you may use resources that are "owned" by any ancestor zones. So this is okay:
+Within a zone you may use resources that are "owned" by ancestor zones. So this is okay:
 
 ```js
 var server = http.createServer().listen(1234);
@@ -251,14 +340,14 @@ new Zone(function SomeZone() {
 server.on('connection', function() { ... });
 ```
 
-Currently we don't always enforce these rules, but you're not supposed to do this.
-It would also be dumb, since the server will disappear when SomeZone exits itself!
+NOTE: Currently zones don't always enforce these rules, but you're not supposed to do this.
+It would also be dumb, since the server will disappear when `SomeZone()` exits itself!
 
-## The rules of engagement
+### The rules of engagement
 
 It is okay for a zone to temporarily enter an ancestor zone. It is not
-allowed to enter child zones, siblings etc. The rationale behind this is
-that when a zone is alive it's parent must also be alive. Other zones
+allowed to enter child zones, siblings, etc. The rationale behind this is
+that when a zone is alive its parent must also be alive. Other zones
 may exit unless they are aware that code will run inside them.
 
 ```js
@@ -279,16 +368,26 @@ new Zone(function OuterZone() {
 });
 ```
 
-To run code in a child zone use a Gate. See below.
+To run code in a child zone, use a [Gate](#gates).
 
-## Bookkeeping within a zone
+### Zone.data
+
+zone.data is a magical property that that associates arbitraty data with a zone.
+In a way you can think of it as the 'scope' of a zone. Properties that are not explicitly
+defined within the scope of a zone are inherited from the parent zone.
+
+  * In the root zone, `zone.data` equals the global object.
+  * In any other zone, `zone.data` starts off as an empty object with the parent zone's `data` property as it's prototype.
+  * In other words, `zone.data.__proto__ === zone.parent.data`.
+  
+### Bookkeeping within a zone
 
 Resources and asynchronous operations register themselves with the parent zone. There are two reasons for this:
 
   * The zone needs to keep a reference count of callbacks that will or may happen in the future.
   * The asynchronous operation or resource can register a destructor that is called before the zone exits.
 
-## Reference counting
+### Reference counting
 
 The reference counting scheme is similar to the one libuv uses. However
 it is more complex because events don't necessarily originate from the
@@ -362,7 +461,7 @@ new Zone(function OuterZone() {
 });
 ```
 
-## The cleanup procedure
+### Cleanup procedure
 
 (This is currently not implemented correctly!)
 
@@ -401,75 +500,22 @@ timer.Interval | ?                                        | ?
 Zone           | set state to 'success' and start cleanup | set state to 'failed' and start cleanup
 Event listener | remove listener                          | remove listener, call the 'error' handler registered by the zone, or throw if there is none
 
-## Zone.data
-
-zone.data is a magical property that can be used by users to associate
-arbitraty data with a zone. In a way you can think of it as the 'scope'
-of a zone. Properties that are not explicitly defined within the scope
-of a zone are inherited from the parent zone.
-
-  * In the root zone, `zone.data` equals the global object.
-  * In any other zone, `zone.data` starts off as an empty object with the parent zone's `data` property as it's prototype.
-  * In other words, `zone.data.__proto__ === zone.parent.data`.
-
-## The curried constructor
-
-Under some circumstances it may be desirable to create a function that is always wrapped within a zone.
-The obvious way to do this:
-
-```js
-function renderTemplate(fileName, cb) {
-  new Zone(function() {
-    // Asynchronous unicorns and something with fileName.
-    ...
-  }).setCallback(cb);
-}
-```
-
-To make this a little less verbose we've added the 'curried
-constructor' concept. It is possible to call `zone.Zone` without the
-`new` keyword. When you do so a new zone constructor is created which is
-pre-seeded with a body. Arguments passed to the constructor are
-forwarded to the body function. Example:
-
-
-```js
-var renderTemplate = Zone(function(fileName, cb) {
-  zone.setCallback(cb);
-  // Rainbow.
-  ...
-});
-```
-
-Now you can use this zone template as follows:
-
-```js
-renderTemplate('bar', function(err, result) {
-  if (err)
-    throw err;
-  // Do something with the result
-  ...
-});
-```
-
 ## Gates
 
 As explained earlier, it is not allowed to arbitrarily enter a zone from
-another zone, the only exception being that you can always enter one of your
-ancestor zones.
+another zone; the only exception being that you can always enter an ancestor zones.
 
 The reason is that the zone library can't predict if and how often you are
 going to run a function inside a particular zone.
 
-For the cases where you need to do this anyway, the Gate construct was
-invented. By creating a gate you're allowing another zone (and all of it's
-descendant zones) to enter the current zone in the future. This means that the
+For the cases where you need to do this anyway, use a _gate_. By creating a gate you're allowing another
+zone (and all of its descendant zones) to enter the current zone in the future. This means that the
 gate also prevents the zone from exiting.
 
-(The Gate API isn't final.)
+**NOTE: The Gate API isn't final.**
 
-## Gate example
-The canonical way to create a gate:
+### Gate example
+The canonical way to create a gate is, for example:
 
 ```
 require('zone');
@@ -492,9 +538,9 @@ new Zone(function OuterZone() {
 });
 ```
 
-## Gate constructor
+### Gate constructor
 
-The `Gate([fn], [gate]) constructor takes two optional arguments.
+The `Gate([fn], [gate])` constructor takes two optional arguments.
 
   * `fn` is a function that is synchronously run inside the ancestor zone.
     Within this function, `this` refers to the gate object.
@@ -502,21 +548,16 @@ The `Gate([fn], [gate]) constructor takes two optional arguments.
     If this parameter is omitted the root zone is assumed, which means that all
     zones are allowed to use this gate.
 
-## The curried gate constructor
+### The curried gate constructor
 
-Just like the Zone() function, the Gate() function can be used as a curried
-constructor.
-
-Here's an example to demonstrate how to use it.
+Just like the `Zone()` function, you can use the `Gate()` function as a curried constructor.
+In the following example, assume that `noZoneSetTimeout(callback, msec)` is a function that doesn't
+support zones, so the callback is always run in the root zone.
+Now we want to wrap it and make it run the callback in the zone that called `setTimeout()`.
 
 ```js
-// Assume that noZoneSetTimeout(callback, msec) is a function that doesn't
-// support zones, so the callback is always run in the root zone.
-// Now we want to wrap it and make it run the callback in the zone that
-// called setTimeout.
-
 global.setTimeout = Gate(function(callback, msec) {
-  // When we get here, a gate fromthe root zone to the caller zone has been
+  // When we get here, a gate from the root zone to the caller zone has been
   // opened.
   var self = this;
 
@@ -531,12 +572,12 @@ global.setTimeout = Gate(function(callback, msec) {
 });
 ```
 
-Note that in the above example, the `global.setTimeOut` function actually
+In the above example, the `global.setTimeOut` function actually
 returns the gate created, because it's really a constructor.
 
 TODO: do we need to do something about that?
 
-# API reference
+## API reference
 
 ### `zone`
 
