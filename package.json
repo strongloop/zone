@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tap --timeout=2 tests",
+    "test": "tap --timeout=2 tests/*.js",
     "test-verbose": "NODE_DEBUG=test tap --tap --stderr tests"
   },
   "repository": {
