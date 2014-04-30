@@ -1,7 +1,5 @@
 # StrongLoop zone library
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 - [Overview](#overview)
   - [Disclaimer](#disclaimer)
 - [Using zones](#using-zones)
@@ -55,8 +53,6 @@
   - [`Gate#apply(thisObj, fn, arguments)`](#gate#applythisobj-fn-arguments)
   - [`Gate#applyAsync(thisObj, fn, arguments)`](#gate#applyasyncthisobj-fn-arguments)
   - [`Gate#schedule(fn, [args...])`](#gate#schedulefn-args)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 
