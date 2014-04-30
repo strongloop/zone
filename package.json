@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/run-tests.js",
+    "test": "node test/run-tests.js"
   },
   "repository": {
     "type": "git",
@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/strongloop/zone/issues"
   },
-  "homepage": "https://github.com/strongloop/zone",
-  "devDependencies": {
-    "tap": "git://github.com/strongloop/node-tap#zoneified"
-  }
+  "homepage": "https://github.com/strongloop/zone"
 }
