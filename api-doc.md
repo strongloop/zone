@@ -35,6 +35,8 @@
   - [`Gate#applyAsync(thisObj, fn, arguments)`](#gate#applyasyncthisobj-fn-arguments)
   - [`Gate#schedule(fn, [args...])`](#gate#schedulefn-args)
 
+## Zone
+
 ### `zone`
 
 This global variable always contains a reference to the active zone.
