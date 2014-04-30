@@ -1,5 +1,6 @@
-- [API reference](#api-reference)
-  - [`zone`](#zone)
+# API reference
+
+- [`Zone`](#zone)
   - [`new Zone(bodyFn, [callback])`](#new-zonebodyfn-callback)
   - [`zone.Zone(body)`](#zonezonebody)
   - [`Zone#run(fn, [args...])`](#zone#runfn-args)
@@ -22,6 +23,7 @@
   - [`Zone#parent`](#zone#parent)
   - [`Zone#root`](#zone#root)
   - [`Zone#data`](#zone#data)
+- [`Gate`](#Gate)
   - [`new Gate([fn], [ancestorZone])`](#new-gatefn-ancestorzone)
   - [`Gate(fn, [ancestorZone])`](#gatefn-ancestorzone)
   - [`Gate#close()`](#gate#close)
@@ -32,8 +34,6 @@
   - [`Gate#apply(thisObj, fn, arguments)`](#gate#applythisobj-fn-arguments)
   - [`Gate#applyAsync(thisObj, fn, arguments)`](#gate#applyasyncthisobj-fn-arguments)
   - [`Gate#schedule(fn, [args...])`](#gate#schedulefn-args)
-
-## API reference
 
 ### `zone`
 
