@@ -44,6 +44,8 @@ The StrongLoop Zone library addresses several issues in Node application develop
   * Sometimes you need to associate user data to an asynchronous flow.
     There is currently no way to do this.  
 
+See also the [API Reference](api-doc.md).
+
 ### Disclaimer
 
 This README is intended for developers interested
