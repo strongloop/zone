@@ -16,9 +16,9 @@ pipeNames = pipeNames.filter(function(name) {
   return prefix + path.sep + name;
 });
 
-dumpNext();
+  inspectNext();
 
-function dumpNext() {
+function inspectNext() {
   var pipeName = pipeNames.shift();
 
   if (!pipeName)
@@ -27,5 +27,5 @@ function dumpNext() {
   var conn = net.connect(pipeName);
   conn.pipe(process.stdout);
   conn.on('error', function() {});
-  conn.on('close', dumpNext);
+  conn.on('close', inspectNext);
 }
