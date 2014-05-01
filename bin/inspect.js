@@ -16,7 +16,11 @@ pipeNames = pipeNames.filter(function(name) {
   return prefix + path.sep + name;
 });
 
+if (pipeNames.length > 0)
   inspectNext();
+else
+  console.log('No zone processes found');
+
 
 function inspectNext() {
   var pipeName = pipeNames.shift();
