@@ -7,6 +7,7 @@ var path = require('path');
 var prefix = isWindows ? '\\\\?\\pipe'
                        : '/tmp';
 
+
 var pipeNames = fs.readdirSync(prefix);
 
 pipeNames = pipeNames.filter(function(name) {
