@@ -22,3 +22,5 @@ for (var i = 0; i < 10; i++) {
     });
   });
 }
+
+console.log("Run the inspect tool to see what's going on in this process.");
