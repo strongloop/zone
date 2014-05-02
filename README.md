@@ -461,7 +461,7 @@ It is up to the entity itself to respond appropriately to a signal. Some example
 Entity         | Success response                         | Failure response
 -------------- | ---------------------------------------- | ---------------------------------------
 fs.write       | await completion                         | cancel and report CancellationError
-net.Socket     | stop receiving, graceful close           | abortive close
+net.Socket     | graceful close                           | stop receiving, abortive close
 timer.Interval | ?                                        | ?
 Zone           | set state to 'success' and start cleanup | set state to 'failed' and start cleanup
 Event listener | remove listener                          | remove listener, call the 'error' handler registered by the zone, or throw if there is none
