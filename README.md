@@ -462,7 +462,8 @@ Entity         | Success response                         | Failure response
 -------------- | ---------------------------------------- | ---------------------------------------
 fs.write       | await completion                         | cancel and report CancellationError
 net.Socket     | graceful close                           | stop receiving, abortive close
-timer.Interval | ?                                        | ?
+timer.Timeout  | do nothing                               | cancel the timer (unless the timeout was 0)
+timer.Interval | do nothing                               | cancel the interval timer
 Zone           | set state to 'success' and start cleanup | set state to 'failed' and start cleanup
 Event listener | remove listener                          | remove listener, call the 'error' handler registered by the zone, or throw if there is none
 
