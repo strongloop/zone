@@ -24,37 +24,42 @@ Long stack traces, intelligent error handling, and asynchronous context for node
 
 ## Overview
 
-The StrongLoop Zone library addresses several issues in Node application development:
+The StrongLoop zone library:
 
-  * Stack traces are useless when an asynchronous function fails.
-
-  * Asynchronous functions are hard to compose into more high-level APIs.
-    Imagine a simple asynchronous API like `bar(arg1, arg2, cb)`
-    where `cb` is the error-first callback function specified by the user.
-    To use this correctly you must:
-
-    - Call the callback function exactly once (not more).
-    - Not throw an exception synchronously and also call the callback function.
-    - Not call the callback function synchronously.
-
-  * It is difficult to handle errors raised asynchronously.
-    Typically Node will crash. If the user ignores the error, the application may leak resources.
-    Zones make it easy to handle errors and avoid resource leaks.
-
-  * Sometimes you need to associate user data to an asynchronous flow.
-    There is currently no way to do this.  
+  * Enables more effective debugging by providing better stack traces for asynchronous functions.
+  * Makes it easier to write and understand asynchronous functions for Node applications.
+  * Makes it easier to handle errors raised asynchronously and avoid resulting resource leaks.
+  * Enables you to associate user data with asynchronous control flow
 
 See also the [API Reference](api-doc.md).
 
-### Disclaimer
+**NOTE**: The zone library and documentation are still under development: there are bugs, missing features, and
+limited documentation.
 
-This README is intended for developers interested
-in the rationale and internals of the zone library. It's rough but it specifies what we're building.
-It isn't particularly suited for end users at this point.
+## Release notes
 
-Currently many things in this document are unimplemented, or implemented differently, or buggy. 
+**IMPORTANT**: You must have Node 0.11 to use zones.
 
-The library is also heavily under development, so we're very open to informed criticism.
+The zone library dynamically modifies ("monkey-patches") Node's asynchronous APIs at runtime.
+As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
+Therefore, you cannot yet use the following modules and functions with zones:
+* [Child processes](http://nodejs.org/api/child_process.html): `exec`, `spawn`, `execFile`
+* Cluster
+* Crypto: `pbkdf2`, `randomBytes`, `pseudoBytes`
+* Domain: _Unknown_
+* Events: Special rules for using them across zones _NEED MORE INFO_
+* Fs: `fs.watch`, `fs.watchFile`, `fs.FSWatcher` 
+* Process object: `process.on('SIGHUP')`, etc.
+* require: Modules are always loaded globally
+* HTTP: Issues with [agent](http://nodejs.org/api/http.html#http_class_http_agent)
+* HTTPS: No TLS support
+* TLS 
+* UDP 
+* ZLIB 
+
+Other implementation notes:
+* Gate API might change.
+* Generator/yield support not done.
 
 ## Using zones
 
@@ -64,12 +69,13 @@ To use zones, add the following as the very first line of your program:
 require('zone');
 ```
 
-The zone library monkey-patches all asynchronous APIs and exports a
-global called `zone`. The `zone` global always refers to the currently
-active zone. Some methods that can always be found on the 'zone' object
+The zone library exports a global variable, `zone`. 
+The `zone` global variable always refers to the currently active zone. 
+Some methods that can always be found on the 'zone' object
 are actually static methods of the `Zone` class, so they don't do anything
-with the currently active zone. After loading the zone library the
-program has entered the 'root' zone.
+with the currently active zone. 
+
+After loading the zone library the program has entered the 'root' zone.
 
 ### Creating a zone
 
@@ -92,7 +98,7 @@ new Zone(function MyZone() {
 ```
 
 The zone constructor function is called synchronously.
-Of course zones can also be nested.
+You can also nest zones.
 
 #### The curried constructor
 
