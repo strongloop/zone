@@ -3,7 +3,7 @@
 Long stack traces, intelligent error handling, and asynchronous context for node.js v0.11+
 
   - [Overview](#overview)
-    - [Disclaimer](#disclaimer)
+  - [Release notes](#release-notes)
   - [Using zones](#using-zones)
     - [Creating a zone](#creating-a-zone)
       - [The curried constructor](#the-curried-constructor)
