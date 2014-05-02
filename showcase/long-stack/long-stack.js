@@ -1,14 +1,14 @@
 var Zone = require('../../').Zone;
 
 
-demo();
+new Zone(function Outer() {
+  process.nextTick(createMiddleZone);
+});
 
-function demo() {
-  new Zone(function Outer() {
-    new Zone(function() {
-      this.name = 'In the middle';
-      failAsync(1);
-    });
+function createMiddleZone() {
+  new Zone(function() {
+    this.name = 'In the middle';
+    failAsync(1);
   });
 }
 
