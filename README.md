@@ -43,7 +43,6 @@ limited documentation.
 The zone library dynamically modifies ("monkey-patches") Node's asynchronous APIs at runtime.
 As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
 Therefore, you cannot yet use the following modules and functions with zones:
-* [Child processes](http://nodejs.org/api/child_process.html): `exec`, `spawn`, `execFile`
 * Cluster
 * Crypto: `pbkdf2`, `randomBytes`, `pseudoRandomBytes`
 * Domain: _Unknown_
