@@ -45,7 +45,7 @@ As detailed below, some of the modules have not yet been completed, and thus you
 Therefore, you cannot yet use the following modules and functions with zones:
 * [Child processes](http://nodejs.org/api/child_process.html): `exec`, `spawn`, `execFile`
 * Cluster
-* Crypto: `pbkdf2`, `randomBytes`, `pseudoBytes`
+* Crypto: `pbkdf2`, `randomBytes`, `pseudoRandomBytes`
 * Domain: _Unknown_
 * Events: Special rules for using them across zones _NEED MORE INFO_
 * Fs: `fs.watch`, `fs.watchFile`, `fs.FSWatcher` 
