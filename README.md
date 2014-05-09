@@ -28,7 +28,9 @@ The StrongLoop zone library:
   * Makes it easier to handle errors raised asynchronously and avoid resulting resource leaks.
   * Enables you to associate user data with asynchronous control flow
 
-See also the [API Reference](api-doc.md).
+See also:
+  * [API Reference](api-doc.md)
+  * [Internals](internals.md)
 
 **NOTE**: The zone library and documentation are still under development: there are bugs, missing features, and
 limited documentation.
