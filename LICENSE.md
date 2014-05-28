@@ -1,8 +1,9 @@
+Copyright (c) 2013-2014 StrongLoop, Inc and other contributors.
 
-“Zone” uses a dual license model.
+ï¿½Zoneï¿½ uses a dual license model.
 
-You may use this library under the terms of the [Artistic 2.0 license][],
+You may use this library under the terms of the [CPAL license][],
 or under the terms of the [StrongLoop Subscription Agreement][].
 
-[Artistic 2.0 license]: http://opensource.org/licenses/Artistic-2.0
+[CPAL license]: CPAL-1.0.md
 [StrongLoop Subscription Agreement]: http://strongloop.com/license
