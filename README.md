@@ -89,7 +89,7 @@ require('zone');
 var Zone = zone.Zone;
 
 // MyZone is the name of this zone which shows up in stack traces.
-new Zone(function MyZone() {
+zone.create(function MyZone() {
   // At this point the 'zone' global points at the zone instance ("MyZone")
   // that we just created.
 });
@@ -105,7 +105,7 @@ The obvious way to do this:
 
 ```js
 function renderTemplate(fileName, cb) {
-  new Zone(function() {
+  zone.create(function() {
     // Asynchronous unicorns and something with fileName.
     ...
   }).setCallback(cb);
@@ -179,7 +179,7 @@ new zone.Zone(function MyZone() {
 You can use a zone can as a promise too:
 
 ```js
-new Zone(function MyZone() {
+zone.create(function MyZone() {
   // Do whatever
 }).then(function(result) {
   // Runs when succesful
@@ -200,7 +200,7 @@ There are a few ways to explicitly exit a zone:
 A rather pointless example:
 
 ```js
-new Zone(function StatZone() {
+zone.create(function StatZone() {
   fs.stat('/some/file', function(err, result) {
     if (err)
       throw err;
@@ -213,7 +213,7 @@ new Zone(function StatZone() {
 This is equivalent to:
 
 ```js
-new Zone(function StatZone() {
+zone.create(function StatZone() {
   fs.stat('/some/file', zone.complete);
 });
 ```
@@ -226,7 +226,7 @@ Within a zone you may use resources that are "owned" by ancestor zones. So this 
 var server = http.createServer().listen(1234);
 server.listen(1234);
 
-new Zone(function ServerZone() {
+zone.create(function ServerZone() {
   // Yes, allowed.
   server.on('connection', function(req, res) { ... });
 
@@ -240,7 +240,7 @@ However, using resources owned by child zones is not allowed:
 ```js
 var server;
 
-new Zone(function SomeZone() {
+zone.create(function SomeZone() {
  server = http.createServer().listen(1234);
 });
 
@@ -259,8 +259,8 @@ that when a zone is alive its parent must also be alive. Other zones
 may exit unless they are aware that code will run inside them.
 
 ```js
-new Zone(function OuterZone() {
-  var childZone = new Zone(function ChildZone() {
+zone.create(function OuterZone() {
+  var childZone = zone.create(function ChildZone() {
     ...
   });
 
@@ -309,10 +309,10 @@ The canonical way to create a gate is, for example:
 ```
 require('zone');
 
-new Zone(function OuterZone() {
+zone.create(function OuterZone() {
   var theGate;
 
-  new Zone(function InnerZone() {
+  zone.create(function InnerZone() {
     // Construct a Gate that allows out parent zone (OuterZone) to enter
     // the current zone (InnerZone).
     theGate = new Gate(zone.parent);

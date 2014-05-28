@@ -20,10 +20,10 @@ it is more complex because events don't necessarily originate from the
 "root". Consider the following case:
 
 ```js
-new Zone(function OuterZone() {
+zone.create(function OuterZone() {
   var emitter = new EventEmitter();
 
-  new Zone(function InnerZone() {
+  zone.create(function InnerZone() {
     emitter.on('some-event', function() {
       zone.return(42);
     });
@@ -42,12 +42,12 @@ Every zone has a reference count (number) equal to number of events
 zones* are waiting for. To demonstrate:
 
 ```js
-new Zone(function() {
+zone.create(function() {
 var emitter = new EventEmitter();
 
-new Zone(function() {
+zone.create(function() {
 
-  new Zone(function() {
+  zone.create(function() {
     emitter.on('bar', function() {...});
     // Reference count == 1:
     // * the 'bar' event originates from the grandparent
@@ -70,10 +70,10 @@ new Zone(function() {
 This avoids the deadlock:
 
 ```js
-new Zone(function OuterZone() {
+zone.create(function OuterZone() {
   var emitter = new EventEmitter();
 
-  new Zone(function InnerZone() {
+  zone.create(function InnerZone() {
     emitter.on('some-event', function() {
       zone.return(42);
     });

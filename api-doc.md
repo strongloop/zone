@@ -1,7 +1,7 @@
 # API reference
 
 - [`Zone`](#zone)
-  - [`new Zone(bodyFn, [callback])`](#new-zonebodyfn-callback)
+  - [`zone.create(bodyFn, [callback])`](#new-zonebodyfn-callback)
   - [`Zone#run(fn, [args...])`](#zone#runfn-args)
   - [`Zone#runUnsafe(fn, [args...])`](#zone#rununsafefn-args)
   - [`Zone#runAsync(fn, [args])`](#zone#runasyncfn-args)
@@ -39,9 +39,9 @@
 
 This global variable always contains a reference to the active zone.
 
-### `new Zone(bodyFn, [callback])`
+### `zone.create(bodyFn, [callback])`
 
-Constructs a new zone.
+Create a new zone inside the active zone.
 
 * `bodyFn`: the function to be run sycnhronously inside the new zone.
 * `callback(err, result)` and optional error-first callback that will be run
