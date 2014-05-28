@@ -12,7 +12,7 @@ var Zone = zone.Zone;
 
 var callbackCount = 0;
 
-new Zone(function() {
+zone.create(function() {
   setTimeout(function() {
     throw new Error('This code should never run');
   }, 1000);

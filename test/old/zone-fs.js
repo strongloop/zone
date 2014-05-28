@@ -3,7 +3,7 @@ var fs = require('fs');
 
 if (true) {
   tap.test('fs.stat', function(t) {
-    new zone.Zone(function() {
+    zone.create(function() {
       fs.stat('.', zone.callback);
     }, function(err, stat) {
       t.ok(stat.isDirectory());
@@ -12,7 +12,7 @@ if (true) {
   });
 
   tap.test('setTimeout callback is optional', function(t) {
-    new zone.Zone(function() {
+    zone.create(function() {
       setTimeout(null, 100);
     }, function(err) {
       t.equal(err, null);
@@ -26,7 +26,7 @@ if (false) {
     // Demonstrate that even without a timer callback, a zone doesn't complete
     // until the timer completes.
     var timer;
-    new zone.Zone(function() {
+    zone.create(function() {
       timer = setTimeout(null, 100);
       console.log('timer:', timer);
       t.ok(timer._idleNext);
@@ -43,7 +43,7 @@ if (false) {
 
 if (true) {
   tap.test('fs.stat callback is optional', function(t) {
-    new zone.Zone(function() {
+    zone.create(function() {
       fs.stat('.');
     }, function(err) {
       if (err)
@@ -59,7 +59,7 @@ if (true) {
     t.plan(2);
 
     var fd;
-    new zone.Zone(function() {
+    zone.create(function() {
       fd = fs.openSync('_', 'w');
       tap.log('open fd %d', fd);
     }, function() {
@@ -74,7 +74,7 @@ if (true) {
     t.plan(2);
 
     var fd;
-    new zone.Zone(function() {
+    zone.create(function() {
       fd = fs.openSync('_', 'w');
       tap.log('open fd %d', fd);
     }, function() {
@@ -91,7 +91,7 @@ if (true) {
     t.plan(2);
 
     var fd;
-    new zone.Zone(function() {
+    zone.create(function() {
       fs.open('_', 'w', function(err, _) {
         fd = _;
       });

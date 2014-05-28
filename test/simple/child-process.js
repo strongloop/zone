@@ -15,7 +15,7 @@ process.on('exit', function() {
 });
 
 
-var spawnZone = new Zone(function SpawnZone() {
+var spawnZone = zone.create(function SpawnZone() {
   setTimeout(function() {
     callbackCount++;
     assert(zone === spawnZone);
@@ -39,7 +39,7 @@ var spawnZone = new Zone(function SpawnZone() {
 });
 
 
-var execZone = new Zone(function ExecZone() {
+var execZone = zone.create(function ExecZone() {
   exec('echo hello world', callback);
 
   function callback(err, stdout, stderr) {
@@ -51,7 +51,7 @@ var execZone = new Zone(function ExecZone() {
 });
 
 
-var execFileZone = new Zone(function ExecFileZone() {
+var execFileZone = zone.create(function ExecFileZone() {
   execFile('inv$alid~file', [], callback);
 
   function callback(err, stdout, stderr) {

@@ -9,11 +9,11 @@ var agent1, agent2, agent3;
 
 agent1 = _http_agent.globalAgent;
 
-new Zone(function() {
+zone.create(function() {
   agent2 = _http_agent.globalAgent;
 });
 
-new Zone(function() {
+zone.create(function() {
   agent3 = _http_agent.globalAgent;
 });
 

@@ -2,19 +2,19 @@ require('../../').enable(); // enable zones
 
 var Zone = zone.Zone;
 
-new Zone(function Outer() {
+zone.create(function Outer() {
   process.nextTick(createMiddleZone);
 });
 
 function createMiddleZone() {
-  new Zone(function() {
+  zone.create(function() {
     this.name = 'In the middle';
     failAsync(1);
   });
 }
 
 function failAsync(timeout) {
-  new Zone(function AsyncFailZone(timeout) {
+  zone.create(function AsyncFailZone(timeout) {
     setTimeout(function() {
       function_that_doesnt_exist();
     }, timeout);

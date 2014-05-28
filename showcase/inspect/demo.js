@@ -4,7 +4,7 @@ var Zone = zone.Zone;
 var net = require('net');
 
 
-new Zone(function ServerZone() {
+zone.create(function ServerZone() {
   var server = net.createServer(function(conn) {
     conn.resume();
   });
@@ -14,9 +14,9 @@ new Zone(function ServerZone() {
 
 
 for (var i = 0; i < 10; i++) {
-  new Zone(function ConnectionZone() {
+  zone.create(function ConnectionZone() {
     var conn = net.connect(3000, function() {
-      new Zone(function IntervalZone() {
+      zone.create(function IntervalZone() {
         setInterval(function() {
           conn.write('hello');
         }, 1);

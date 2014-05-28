@@ -34,7 +34,7 @@ function testCreateZone(description, ctor) {
 
 testCreateZone('new anonymous zone', function ctor(callback) {
   ctor.expectedName = 'Anonymous';
-  return new zone.Zone(function() {
+  return zone.create(function() {
     return callback();
   });
 });
@@ -48,7 +48,7 @@ testCreateZone('wrapped anonymous zone', function ctor(callback) {
 
 testCreateZone('new named zone', function ctor(callback) {
   ctor.expectedName = 'myName';
-  return new zone.Zone(function myName() {
+  return zone.create(function myName() {
     return callback();
   });
 });

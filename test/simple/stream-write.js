@@ -16,7 +16,7 @@ process.stdout.write('Write from root zone\n', function() {
 });
 
 
-var writeZone = new Zone(function WriteZone() {
+var writeZone = zone.create(function WriteZone() {
   process.stdout.write('Write from child zone\n', function() {
     callbackCount++;
 

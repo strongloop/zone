@@ -3,7 +3,7 @@ var net = require('net');
 var EventEmitter = require('events').EventEmitter;
 
 tap.test('zones wait for handles', function(t) {
-  new zone.Zone(function() {
+  zone.create(function() {
     var ee = net.createServer().listen(0);
     this.throw(Error('bye'));
     setTimeout(function() {
@@ -21,7 +21,7 @@ tap.test('zones catch error events', function(t) {
   t.end();
   return; // the error event just kills tap :-(
 
-  new zone.Zone(function() {
+  zone.create(function() {
     var ee = new EventEmitter();
     process.nextTick(function() {
       ee.emit('error', Error('bye'));

@@ -7,7 +7,7 @@ var Gate = zone.Gate;
 var Zone = zone.Zone;
 
 tap.test('smoke test', function(t) {
-  new Zone(function outer_zone() {
+  zone.create(function outer_zone() {
     tap.log('Beginning zone %s', zone.name);
 
     var n = 5;
@@ -17,7 +17,7 @@ tap.test('smoke test', function(t) {
         clearInterval(iv);
     }, 50);
 
-    new Zone(function inner_zone() {
+    zone.create(function inner_zone() {
       tap.log('Beginning zone %s', zone.name);
       setTimeout(function() {
         tap.log('setTimeout callback in zone %s', zone.name);
@@ -26,7 +26,7 @@ tap.test('smoke test', function(t) {
       tap.log('Zone inner_zone ended, back in %s. Error: ', zone.name, error);
     });
 
-    new Zone(function stat_zone() {
+    zone.create(function stat_zone() {
       var statZone = this;
       fs.stat('bla', function(error, stats) {
         assert.strictEqual(zone, statZone);
@@ -44,10 +44,10 @@ tap.test('smoke test', function(t) {
     if (error) throw error;
   });
 
-  new Zone(function EventEmitterTestOuterZone() {
+  zone.create(function EventEmitterTestOuterZone() {
     var ee = new EventEmitter();
 
-    new Zone(function EventEmitterTestInnerZone() {
+    zone.create(function EventEmitterTestInnerZone() {
       ee.on('test', function() {
         tap.log('bla');
       });

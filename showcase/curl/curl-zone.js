@@ -6,7 +6,7 @@ var http = require('http');
 var cache = {};
 
 function curl(url, cb) {
-  new Zone(function CurlZone() {
+  zone.create(function CurlZone() {
     if (cache[url])
       // A zone always completes asynchronously, as the user would expect,
       // even when it returns a result immediately.

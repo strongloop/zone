@@ -8,7 +8,7 @@ var Zone = zone.Zone;
 var callbackCount = 0;
 
 // Test error-first callback with result.
-new Zone(function() {
+zone.create(function() {
   zone.return(42);
 
 }).setCallback(function(err, a, b) {
@@ -19,7 +19,7 @@ new Zone(function() {
 });
 
   // Test error-first callback with error.
-new Zone(function() {
+zone.create(function() {
   zone.return(42);
   throw new Error();
 
@@ -30,7 +30,7 @@ new Zone(function() {
 });
 
 // Test catch callback.
-new Zone(function() {
+zone.create(function() {
   zone.throw(new Error());
 
 }).catch (function(err) {
@@ -39,7 +39,7 @@ new Zone(function() {
 });
 
 // Test 'then' with error callback.
-new Zone(function() {
+zone.create(function() {
   throw new Error();
 
 }).then(function onSuccess() {
@@ -50,7 +50,7 @@ new Zone(function() {
 });
 
 // Test 'then' with success callback.
-new Zone(function() {
+zone.create(function() {
   this.return(1, 2, 3);
 
 }).then(function onSuccess(a, b, c) {
@@ -63,7 +63,7 @@ new Zone(function() {
 });
 
 // Test .complete() method.
-new Zone(function() {
+zone.create(function() {
   zone.complete(null, 42);
 }).setCallback(function(err, value) {
   assert(value === 42);
@@ -71,7 +71,7 @@ new Zone(function() {
 });
 
 // Test throwing a non-error.
-new Zone(function() {
+zone.create(function() {
   throw 133;
 }).catch (function(err) {
   assert(err instanceof Error);
@@ -80,7 +80,7 @@ new Zone(function() {
 });
 
 // Test auto-exit return value.
-new Zone(function() {
+zone.create(function() {
   // Do nothing.
 }).setCallback(function(err) {
   assert(err === null);

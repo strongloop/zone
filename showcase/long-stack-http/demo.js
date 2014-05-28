@@ -8,7 +8,7 @@ var Zone = zone.Zone;
 // Server
 
 // Create the server in a separate zone.
-var serverZone = new Zone(function ServerZone() {
+var serverZone = zone.create(function ServerZone() {
   var incomingRequestCount = 0;
 
   // Create an http server that listens on port 3000. Further down this in file
@@ -19,7 +19,7 @@ var serverZone = new Zone(function ServerZone() {
     // response objects are not created within this zone - they're created in
     // the zone where the server lives - but the event listeners do live in the
     // IncomingZone.
-    new Zone(function IncomingZone() {
+    zone.create(function IncomingZone() {
 
       // Every time we receive some http POST data, reply with a simple
       // message.
@@ -75,14 +75,14 @@ var serverZone = new Zone(function ServerZone() {
 // Clients
 
 // Create a separate zone to host all request zones.
-new Zone(function ClientZone() {
+zone.create(function ClientZone() {
 
   // Create 10 clients that communicate with the server. The server has a
   // chaos monkey running around that randomly makes requests fail.
   for (var i = 0; i < 10; i++) {
     // Create a new zone for every individual request. This isolates connection
     // errors allowing us to handle then and log a useful stack trace for them.
-    new Zone(function RequestZone() {
+    zone.create(function RequestZone() {
       // Set up the options for the http client.
       var options = {
         method: 'POST',

@@ -18,8 +18,8 @@ var fileName1 = resolve(__dirname, '../temp', 'file1');
 var fileName2 = resolve(__dirname, '../temp', 'file2');
 var fd1, fd2;
 
-new Zone(function() {
-  new Zone(function() {
+zone.create(function() {
+  zone.create(function() {
     fs.open(fileName1, 'w+', function(err, fd) {
       callbackCount++;
 
@@ -35,7 +35,7 @@ new Zone(function() {
     assert(/expected/.test(err));
   });
 
-  new Zone(function() {
+  zone.create(function() {
     fd2 = fs.openSync(fileName2, 'w+');
   });
 
