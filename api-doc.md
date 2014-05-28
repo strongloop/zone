@@ -2,7 +2,6 @@
 
 - [`Zone`](#zone)
   - [`new Zone(bodyFn, [callback])`](#new-zonebodyfn-callback)
-  - [`zone.Zone(body)`](#zonezonebody)
   - [`Zone#run(fn, [args...])`](#zone#runfn-args)
   - [`Zone#runUnsafe(fn, [args...])`](#zone#rununsafefn-args)
   - [`Zone#runAsync(fn, [args])`](#zone#runasyncfn-args)
@@ -25,7 +24,6 @@
   - [`Zone#data`](#zone#data)
 - [`Gate`](#Gate)
   - [`new Gate([fn], [ancestorZone])`](#new-gatefn-ancestorzone)
-  - [`Gate(fn, [ancestorZone])`](#gatefn-ancestorzone)
   - [`Gate#close()`](#gate#close)
   - [`Gate#run(fn, [args...])`](#gate#runfn-args)
   - [`Gate#runAsync(fn, [args...])`](#gate#runasyncfn-args)
@@ -48,10 +46,6 @@ Constructs a new zone.
 * `bodyFn`: the function to be run sycnhronously inside the new zone.
 * `callback(err, result)` and optional error-first callback that will be run
   inside the parent zone after the zone has exited.
-
-### `zone.Zone(body)`
-
-Returns a curried zone constructor.
 
 ### `Zone#run(fn, [args...])`
 ### `Zone#runUnsafe(fn, [args...])`
@@ -158,10 +152,6 @@ Opens a gate that allows `ancestorZone` to make callbacks to the current zone.
 If a function is specified, the ancestor zone is temporarily entered, and `fn` is
 run inside it with `this` bound to the newly constructed gate. If the `fn` function
 throws, no Gate is constructed and the error is rethrown in the calling zone.
-
-### `Gate(fn, [ancestorZone])`
-
-Returns a curried Gate constructor.
 
 ### `Gate#close()`
 
