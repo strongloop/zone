@@ -1,5 +1,6 @@
-var Zone = require('../../').Zone;
+require('../../').enable();
 
+var Zone = zone.Zone;
 
 process.nextTick(doSomethingAsync);
 

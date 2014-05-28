@@ -1,4 +1,6 @@
-var Zone = require('../../').Zone;
+require('../../').enable();
+
+var Zone = zone.Zone;
 var http = require('http');
 
 var cache = {};

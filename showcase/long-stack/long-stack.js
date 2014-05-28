@@ -1,5 +1,6 @@
-var Zone = require('../../').Zone;
+require('../../').enable(); // enable zones
 
+var Zone = zone.Zone;
 
 new Zone(function Outer() {
   process.nextTick(createMiddleZone);

@@ -1,4 +1,6 @@
-var Zone = require('../../').Zone; // require('zone');
+require('../../').enable(); // enable zones
+
+var Zone = zone.Zone;
 var net = require('net');
 
 

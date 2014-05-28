@@ -1,2 +1,2 @@
 
-require('../'); // zone
+require('../').enable(); // enable zones

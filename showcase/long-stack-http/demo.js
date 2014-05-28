@@ -1,4 +1,4 @@
-require('../../'); // require('zone');
+require('../../').enable(); // enable zones
 
 var http = require('http');
 var util = require('util');
