@@ -64,7 +64,7 @@ Other implementation notes:
 To use zones, add the following as the very first line of your program:
 
 ```js
-require('zone');
+require('zone').enable();
 ```
 
 The zone library exports a global variable, `zone`. 
@@ -82,7 +82,7 @@ create a one-off zone is:
 
 ```js
 // Load the library
-require('zone');
+require('zone').enable();
 
 // Zone is the zone constructor.
 // It is always avaiable as a property on the `zone` global.
@@ -152,7 +152,7 @@ Zones also automatically exit when no explicit value is returned.
 A way to obtain the outcome of a zone is:
 
 ```js
-require('zone');
+require('zone').enable();
 var net = require('net');
 
 new zone.Zone(function MyZone() {
@@ -307,7 +307,7 @@ gate also prevents the zone from exiting.
 The canonical way to create a gate is, for example:
 
 ```
-require('zone');
+require('zone').enable();
 
 zone.create(function OuterZone() {
   var theGate;
