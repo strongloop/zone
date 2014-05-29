@@ -1,24 +1,5 @@
 # StrongLoop zone library
 
-Long stack traces, intelligent error handling, and asynchronous context for node.js v0.11+
-
-  - [Overview](#overview)
-  - [Release notes](#release-notes)
-  - [Using zones](#using-zones)
-    - [Creating a zone](#creating-a-zone)
-      - [The curried constructor](#the-curried-constructor)
-    - [Obtaining the result of a zone](#obtaining-the-result-of-a-zone)
-      - [Co-style generators](#co-style-generators)
-      - [Zone vs try...catch](#zone-vs-trycatch)
-    - [Exiting a zone](#exiting-a-zone)
-    - [Sharing resources between zones](#sharing-resources-between-zones)
-    - [The rules of engagement](#the-rules-of-engagement)
-    - [Zone.data](#zonedata)
-  - [Gates](#gates)
-    - [Gate example](#gate-example)
-    - [Gate constructor](#gate-constructor)
-    - [The curried gate constructor](#the-curried-gate-constructor)
-
 ## Overview
 
 The StrongLoop zone library:
@@ -28,36 +9,26 @@ The StrongLoop zone library:
   * Makes it easier to handle errors raised asynchronously and avoid resulting resource leaks.
   * Enables you to associate user data with asynchronous control flow
 
-See also:
-  * [API Reference](api-doc.md)
-  * [Internals](internals.md)
-
-**NOTE**: The zone library and documentation are still under development: there are bugs, missing features, and
-limited documentation.
-
-## Release notes
-
 **IMPORTANT**: You must have Node 0.11 to use zones.
 
-The zone library dynamically modifies ("monkey-patches") Node's asynchronous APIs at runtime.
-As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
-Therefore, you cannot yet use the following modules and functions with zones:
-* Cluster
-* Crypto: `pbkdf2`, `randomBytes`, `pseudoRandomBytes`
-* Domain: _Unknown_
-* Events: Special rules for using them across zones _NEED MORE INFO_
-* Fs: `fs.watch`, `fs.watchFile`, `fs.FSWatcher` 
-* Process object: `process.on('SIGHUP')`, etc.
-* require: Modules are always loaded globally
-* HTTP: Issues with [agent](http://nodejs.org/api/http.html#http_class_http_agent)
-* HTTPS: No TLS support
-* TLS 
-* UDP 
-* ZLIB 
 
-Other implementation notes:
-* Gate API might change.
-* Generator/yield support not done.  See [Unimplemented features](https://github.com/strongloop/zone/wiki/Unimplemented-features) for details.
+## Implementation status
+
+* The zone library and documentation are still under development: there are bugs, missing features, and
+  limited documentation.
+
+* The Gate API will change.
+
+* The zone library dynamically modifies Node's asynchronous APIs at runtime.
+  As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
+  Therefore, you cannot yet use the following modules and functions with zones:
+  - cluster
+  - crypto: `pbkdf2`, `randomBytes`, `pseudoRandomBytes`
+  - fs: `fs.watch`, `fs.watchFile`, `fs.FSWatcher`
+  - process object: `process.on('SIGHUP')` and other signals.
+  - tls / https
+  - udp
+  - zlib
 
 ## Using zones
 
@@ -67,11 +38,11 @@ To use zones, add the following as the very first line of your program:
 require('zone').enable();
 ```
 
-The zone library exports a global variable, `zone`. 
-The `zone` global variable always refers to the currently active zone. 
+The zone library exports a global variable, `zone`.
+The `zone` global variable always refers to the currently active zone.
 Some methods that can always be found on the 'zone' object
 are actually static methods of the `Zone` class, so they don't do anything
-with the currently active zone. 
+with the currently active zone.
 
 After loading the zone library the program has entered the 'root' zone.
 
@@ -84,10 +55,6 @@ create a one-off zone is:
 // Load the library
 require('zone').enable();
 
-// Zone is the zone constructor.
-// It is always avaiable as a property on the `zone` global.
-var Zone = zone.Zone;
-
 // MyZone is the name of this zone which shows up in stack traces.
 zone.create(function MyZone() {
   // At this point the 'zone' global points at the zone instance ("MyZone")
@@ -96,9 +63,9 @@ zone.create(function MyZone() {
 ```
 
 The zone constructor function is called synchronously.
-You can also nest zones.
 
-#### The curried constructor
+
+#### Defining zone functions
 
 Under some circumstances it may be desirable to create a function that is always wrapped within a zone.
 The obvious way to do this:
@@ -106,22 +73,20 @@ The obvious way to do this:
 ```js
 function renderTemplate(fileName, cb) {
   zone.create(function() {
-    // Asynchronous unicorns and something with fileName.
+    // Actual work here
     ...
   }).setCallback(cb);
 }
 ```
 
-To make this a little less verbose the "curried constructor" makes it possible to call `zone.Zone`
-without the `new` keyword.  Doing so creates a new zone constructor that is
-pre-seeded with a body. Arguments passed to the constructor are
-forwarded to the body function. Example:
-
+To make this a little less verbose there is the 'zone.define()' API.
+With it you can wrap a function such that when it's called a zone is created.
+Example:
 
 ```js
-var renderTemplate = Zone(function(fileName, cb) {
+var renderTemplate = zone.define(function(fileName, cb) {
   zone.setCallback(cb);
-  // Rainbow.
+  // Actual work here
   ...
 });
 ```
@@ -155,7 +120,7 @@ A way to obtain the outcome of a zone is:
 require('zone').enable();
 var net = require('net');
 
-new zone.Zone(function MyZone() {
+zone.create(function MyZone() {
   // This runs in the context of MyZone
   net.createConnection(...);
   fs.stat(...)
@@ -176,7 +141,8 @@ new zone.Zone(function MyZone() {
 });
 ```
 
-You can use a zone can as a promise too:
+You can also use the `then` and `catch` methods, as if it were a promise.
+Note that unlike promises you can't currently chain calls callbacks.
 
 ```js
 zone.create(function MyZone() {
@@ -287,9 +253,11 @@ defined within the scope of a zone are inherited from the parent zone.
   * In the root zone, `zone.data` equals the global object.
   * In any other zone, `zone.data` starts off as an empty object with the parent zone's `data` property as it's prototype.
   * In other words, `zone.data.__proto__ === zone.parent.data`.
-  
+
 
 ## Gates
+
+**NOTE: The Gate API will be replaced by something that's easier to use!**
 
 As explained earlier, it is not allowed to arbitrarily enter a zone from
 another zone; the only exception being that you can always enter an ancestor zones.
@@ -300,8 +268,6 @@ going to run a function inside a particular zone.
 For the cases where you need to do this anyway, use a _gate_. By creating a gate you're allowing another
 zone (and all of its descendant zones) to enter the current zone in the future. This means that the
 gate also prevents the zone from exiting.
-
-**NOTE: The Gate API isn't final.**
 
 ### Gate example
 The canonical way to create a gate is, for example:
@@ -339,7 +305,7 @@ The `Gate([fn], [gate])` constructor takes two optional arguments.
 
 ### The curried gate constructor
 
-Just like the `Zone()` function, you can use the `Gate()` function as a curried constructor.
+You can use the `Gate()` function as a curried constructor.
 In the following example, assume that `noZoneSetTimeout(callback, msec)` is a function that doesn't
 support zones, so the callback is always run in the root zone.
 Now we want to wrap it and make it run the callback in the zone that called `setTimeout()`.
@@ -364,4 +330,6 @@ global.setTimeout = Gate(function(callback, msec) {
 In the above example, the `global.setTimeOut` function actually
 returns the gate created, because it's really a constructor.
 
-TODO: do we need to do something about that?
+## Other documentation
+  * [API Reference](api-doc.md)
+  * [Internals](internals.md)
