@@ -1,4 +1,6 @@
-require('../../').enable(); // enable zones
+// Normally this would be: require('zone').enable();
+require('../../').enable();
+
 
 var Zone = zone.Zone;
 
@@ -13,10 +15,8 @@ function createMiddleZone() {
   });
 }
 
-function failAsync(timeout) {
-  zone.create(function AsyncFailZone(timeout) {
-    setTimeout(function() {
-      function_that_doesnt_exist();
-    }, timeout);
-  });
-}
+var failAsync = zone.define(function AsyncFailZone(timeout) {
+  setTimeout(function() {
+    function_that_doesnt_exist();
+  }, timeout);
+});
