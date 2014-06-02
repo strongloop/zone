@@ -271,7 +271,7 @@ It would also be dumb, since the server will disappear when `SomeZone()` exits i
 
 ### Zone.data
 
-zone.data is a magical property that that associates arbitraty data with a zone.
+zone.data is a magical property that that associates arbitrary data with a zone.
 In a way you can think of it as the 'scope' of a zone. Properties that are not explicitly defined within the scope of a zone are inherited from the parent zone.
 
   * In the root zone, `zone.data` equals the global object.
