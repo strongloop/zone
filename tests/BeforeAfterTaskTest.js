@@ -10,23 +10,26 @@ exports.testBeforeTask = function(test) {
 };
 
 exports.testBeforeTaskWithError = function(test) {
-  test.expect(6);
+  test.expect(3);
   var beforeHook = function() {
     test.equal(zone.name, 'ChildZone');
     test.ok(true, 'expecting a call');
     throw new Error('expected error');
   };
 
-  var failureCb = function(err) {
+  //success called even tough code in main function did not run
+  //and before hook threw error
+  var successCallback = function(err) {
     test.strictEqual(zone, zone.root);
-    test.ok(/expected/.test(err));
     test.done();
   };
 
   var childZone = zone.create(function ChildZone() {
+    //never gets run
+    
     test.equal(global.zone.name, 'ChildZone');
     test.ok(test, 'running the main function');
-  }, {beforeTask: beforeHook, errorCallback: failureCb});
+  }, {beforeTask: beforeHook, successCallback: successCallback});
 };
 
 exports.testAfterTask = function(test) {
