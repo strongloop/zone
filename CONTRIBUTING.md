@@ -9,7 +9,7 @@ Contributing to zones is easy. In a few simple steps:
   * Ensure that your effort is aligned with the project’s roadmap by
     talking to the maintainers, especially if you are going to spend a
     lot of time on it. This project is currently maintained by
-    @piscisaureus and @sam-github.
+    @kraman, @piscisaureus and @sam-github.
 
   * Make something better or fix a bug.
 

@@ -35,10 +35,10 @@ function curl(url, cb) {
       });
     });
 
-  // The zone takes an error-first callback that it will always call exactly
-  // once - even if due to a programmer error the zone never explicitly
-  // returns a result. In this case we're just forwarding to the callback that
-  // the user passed when calling curl().
+    // The zone takes an error-first callback that it will always call exactly
+    // once - even if due to a programmer error the zone never explicitly
+    // returns a result. In this case we're just forwarding to the callback that
+    // the user passed when calling curl().
   }).setCallback(cb);
 }
 

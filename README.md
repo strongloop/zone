@@ -2,26 +2,28 @@
 
 ## Overview
 
-The StrongLoop zone library:
+The Zone library provides a way to represent the dynamic extent of asynchronous calls in Node. Just like the scope of a function defines where it may be used, the extent of a call represents the lifetime that is it active.
 
-  * Enables more effective debugging by providing better stack traces for asynchronous functions.
-  * Makes it easier to write and understand asynchronous functions for Node applications.
-  * Makes it easier to handle errors raised asynchronously and avoid resulting resource leaks.
+A Zone also provides execution context that can persist across the lifecycle of one or more asynchronous calls. This is similar to the concept of thread-local data in Java.
+
+Zones provide a way to group and track resources and errors across asynchronous operations. In addition zones:
+
+  * Enables more effective debugging by providing better stack traces for asynchronous functions
+  * Makes it easier to write and understand asynchronous functions for Node applications
+  * Makes it easier to handle errors raised asynchronously and avoid resulting resource leaks
   * Enables you to associate user data with asynchronous control flow
-
-**IMPORTANT**: You must have Node 0.11 to use zones.
-
+  
+[Dart's async library](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-async.Zone) and [Brian Ford's zone.js](https://github.com/btford/zone.js/) library provide similar functionality.
 
 ## Implementation status
 
-* The zone library and documentation are still under development: there are bugs, missing features, and
-  limited documentation.
-
-* The Gate API will change.
+* The zone library and documentation are still under development: there are bugs, missing features, and limited documentation.
 
 * The zone library dynamically modifies Node's asynchronous APIs at runtime.
   As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
-  Therefore, you cannot yet use the following modules and functions with zones:
+  
+  The following modules have not been zone enabled:
+  
   - cluster
   - crypto: `pbkdf2`, `randomBytes`, `pseudoRandomBytes`
   - fs: `fs.watch`, `fs.watchFile`, `fs.FSWatcher`
@@ -38,18 +40,13 @@ To use zones, add the following as the very first line of your program:
 require('zone').enable();
 ```
 
-The zone library exports a global variable, `zone`.
-The `zone` global variable always refers to the currently active zone.
-Some methods that can always be found on the 'zone' object
-are actually static methods of the `Zone` class, so they don't do anything
-with the currently active zone.
+The zone library exports a global variable, `zone`. The `zone` global variable always refers to the currently active zone. Some methods that can always be found on the 'zone' object are actually static methods of the `Zone` class, so they don't do anything with the currently active zone.
 
 After loading the zone library the program has entered the 'root' zone.
 
 ### Creating a zone
 
-There are a few different ways to create a zone. The canonical way to
-create a one-off zone is:
+There are a few different ways to create a zone. The canonical way to create a one-off zone is:
 
 ```js
 // Load the library
@@ -63,7 +60,6 @@ zone.create(function MyZone() {
 ```
 
 The zone constructor function is called synchronously.
-
 
 #### Defining zone functions
 
@@ -104,10 +100,7 @@ renderTemplate('bar', function(err, result) {
 
 ### Obtaining the result of a zone
 
-Zones are like asynchronous functions. From the outside perspective,
-they can return a single value or "throw" a single error. There are a
-couple of ways the outside zone may obtain the result of a zone. When a
-zone reports its outcome:
+Zones are like asynchronous functions. From the outside perspective, they can return a single value or "throw" a single error. There are a couple of ways the outside zone may obtain the result of a zone. When a zone reports its outcome:
 
   * No more callbacks will run inside the zone.
   * All non-garbage-collectable resources have been cleaned up.
@@ -154,6 +147,63 @@ zone.create(function MyZone() {
 });
 ```
 
+### Sharing resources between zones
+
+Within a zone you may use resources that are "owned" by ancestor zones. So this is okay:
+
+```js
+var server = http.createServer().listen(1234);
+server.listen(1234);
+
+zone.create(function ServerZone() {
+  // Yes, allowed.
+  server.on('connection', function(req, res) { ... });
+
+  // Totally okay
+  process.stdout.write('hello!');
+});
+```
+
+However, using resources owned by child zones is not allowed:
+
+```js
+var server;
+
+zone.create(function SomeZone() {
+ server = http.createServer().listen(1234);
+});
+
+// NOT OKAY!
+server.on('connection', function() { ... });
+```
+
+NOTE: Currently zones don't always enforce these rules, but you're not supposed to do this. It would also be dumb, since the server will disappear when `SomeZone()` exits itself!
+
+### The rules of engagement
+
+It is okay for a zone to temporarily enter an ancestor zone. It is not
+allowed to enter child zones, siblings, etc. The rationale behind this is
+that when a zone is alive its parent must also be alive. Other zones
+may exit unless they are aware that code will run inside them.
+
+```js
+zone.create(function OuterZone() {
+  var childZone = zone.create(function ChildZone() {
+    ...
+  });
+
+  // Fine.
+  zone.parent.run(function() {
+    console.log('Hello from the root zone!');
+  });
+
+  // NOT ALLOWED
+  childZone.run(function() {
+    console.log('Weird. This isn't supposed to work!');
+  });
+});
+```
+
 ### Exiting a zone
 
 There are a few ways to explicitly exit a zone:
@@ -183,6 +233,8 @@ zone.create(function StatZone() {
   fs.stat('/some/file', zone.complete);
 });
 ```
+
+To run code in a child zone, you can use `zone.bindCallback` and `zone.bindAsyncCallback` to create a callback object which can be invoked from a parent zone.
 
 ### Sharing resources between zones
 
@@ -217,119 +269,11 @@ server.on('connection', function() { ... });
 NOTE: Currently zones don't always enforce these rules, but you're not supposed to do this.
 It would also be dumb, since the server will disappear when `SomeZone()` exits itself!
 
-### The rules of engagement
-
-It is okay for a zone to temporarily enter an ancestor zone. It is not
-allowed to enter child zones, siblings, etc. The rationale behind this is
-that when a zone is alive its parent must also be alive. Other zones
-may exit unless they are aware that code will run inside them.
-
-```js
-zone.create(function OuterZone() {
-  var childZone = zone.create(function ChildZone() {
-    ...
-  });
-
-  // Fine.
-  zone.parent.run(function() {
-    console.log('Hello from the root zone!');
-  });
-
-  // NOT ALLOWED
-  childZone.run(function() {
-    console.log('Weird. This isn't supposed to work!');
-  });
-});
-```
-
-To run code in a child zone, use a [Gate](#gates).
-
 ### Zone.data
 
 zone.data is a magical property that that associates arbitraty data with a zone.
-In a way you can think of it as the 'scope' of a zone. Properties that are not explicitly
-defined within the scope of a zone are inherited from the parent zone.
+In a way you can think of it as the 'scope' of a zone. Properties that are not explicitly defined within the scope of a zone are inherited from the parent zone.
 
   * In the root zone, `zone.data` equals the global object.
   * In any other zone, `zone.data` starts off as an empty object with the parent zone's `data` property as it's prototype.
   * In other words, `zone.data.__proto__ === zone.parent.data`.
-
-
-## Gates
-
-**NOTE: The Gate API will be replaced by something that's easier to use!**
-
-As explained earlier, it is not allowed to arbitrarily enter a zone from
-another zone; the only exception being that you can always enter an ancestor zones.
-
-The reason is that the zone library can't predict if and how often you are
-going to run a function inside a particular zone.
-
-For the cases where you need to do this anyway, use a _gate_. By creating a gate you're allowing another
-zone (and all of its descendant zones) to enter the current zone in the future. This means that the
-gate also prevents the zone from exiting.
-
-### Gate example
-The canonical way to create a gate is, for example:
-
-```
-require('zone').enable();
-
-zone.create(function OuterZone() {
-  var theGate;
-
-  zone.create(function InnerZone() {
-    // Construct a Gate that allows out parent zone (OuterZone) to enter
-    // the current zone (InnerZone).
-    theGate = new Gate(zone.parent);
-  });
-
-  theGate.schedule(function() {
-    // This runs inside the
-    console.log('Hello from InnerZone');
-  });
-
-  theGate.close(); // Close the gate. InnerZone can now exit.
-});
-```
-
-### Gate constructor
-
-The `Gate([fn], [gate])` constructor takes two optional arguments.
-
-  * `fn` is a function that is synchronously run inside the ancestor zone.
-    Within this function, `this` refers to the gate object.
-  * `gate` specifies the the ancestor zone that is allowed to use the gate.
-    If this parameter is omitted the root zone is assumed, which means that all
-    zones are allowed to use this gate.
-
-### The curried gate constructor
-
-You can use the `Gate()` function as a curried constructor.
-In the following example, assume that `noZoneSetTimeout(callback, msec)` is a function that doesn't
-support zones, so the callback is always run in the root zone.
-Now we want to wrap it and make it run the callback in the zone that called `setTimeout()`.
-
-```js
-global.setTimeout = Gate(function(callback, msec) {
-  // When we get here, a gate from the root zone to the caller zone has been
-  // opened.
-  var self = this;
-
-  noZoneSetTimeout(function() {
-    // Call the user callback through the gate so it ends up in the proper
-    // zone.
-    self.schedule(callback);
-
-    // Close the gate, so the caller zone may now exit.
-    self.close();
-  }, msec);
-});
-```
-
-In the above example, the `global.setTimeOut` function actually
-returns the gate created, because it's really a constructor.
-
-## Other documentation
-  * [API Reference](api-doc.md)
-  * [Internals](internals.md)
