@@ -1,6 +1,7 @@
 require('../../').enable();
 
 var Zone = zone.Zone;
+Zone.longStackSupport = true;
 var http = require('http');
 
 var cache = {};

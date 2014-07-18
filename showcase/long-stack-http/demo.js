@@ -4,6 +4,7 @@ var http = require('http');
 var util = require('util');
 var url = require('url');
 var Zone = zone.Zone;
+Zone.longStackSupport = true;
 
 // Server
 

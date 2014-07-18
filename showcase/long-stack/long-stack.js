@@ -1,8 +1,8 @@
 // Normally this would be: require('zone').enable();
 require('../../').enable();
 
-
 var Zone = zone.Zone;
+Zone.longStackSupport = true;
 
 zone.create(function Outer() {
   process.nextTick(createMiddleZone);
