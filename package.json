@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/nodeunit tests/[^_]*.js",
+    "test": "node_modules/.bin/nodeunit test/test-*.js",
     "posttest": "cd benchmarks; ./run_bench.sh",
     "postinstall": "node_modules/.bin/sdocs --out docs"
   },
@@ -21,5 +21,8 @@
   "devDependencies": {
     "nodeunit": "^0.9.0",
     "strong-docs": "git+ssh://git@github.com:strongloop/strong-docs"
+  },
+  "dependencies": {
+    "async-tracer": "*"
   }
 }

@@ -1,13 +1,16 @@
 var http = require('http');
-require('../lib/Setup.js').enable();
-//require('../../zone/lib/Setup.js').enable();
-Error.stackTraceLimit = 0;
+require('../lib/setup.js').enable();
+//require('../../zone/lib/setup.js').enable();
+zone.Zone.longStackSupport = false
 
 var numRequests = 1;
 var start = 0;
 
-http.createServer(function(req, res) {
-  zone.create(function() {
+function RequestHandler(req, res) {
+  zone.create(RequestZone, {arguments: [req, res]});
+}
+
+function RequestZone(req, res){
     if (numRequests === 1) {
       start = Date.now();
     }else if (numRequests >= 100000) {
@@ -19,5 +22,6 @@ http.createServer(function(req, res) {
     ++numRequests;
     res.writeHead(200);
     res.end('hi');
-  });
-}).listen(3001);
+  }
+
+http.createServer(RequestHandler).listen(3001);

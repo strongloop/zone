@@ -1,17 +1,23 @@
-require('../../lib/Setup.js').enable();
+require('../../lib/setup.js').enable();
+
+function RequestZone(req, res, next) {
+    zone.data.url = req.url;
+    next();
+  }
+  
+  function ErrorHandler(err) {
+      console.error(err);
+    }
+
+function ZonedRequestHandler(req, res, next) {
+  zone.create(RequestZone, {arguments: [req, res, next]}).catch (ErrorHandler);
+}
+
 express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-Error.stackTraceLimit = 0;
 
-app.use(function(req, res, next) {
-  zone.create(function RequestZone() {
-    zone.data.url = req.url;
-    next();
-  }).catch (function(err) {
-    console.error(err);
-  });
-});
+app.use(ZonedRequestHandler);
 
 app.use(bodyParser());
 var router = express.Router();

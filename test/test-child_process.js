@@ -1,4 +1,4 @@
-var Zone = require('../lib/Setup.js').enable();
+var Zone = require('../lib/setup.js').enable();
 var assert = require('assert');
 var Zone = zone.Zone;
 
@@ -9,7 +9,9 @@ var spawn = require('child_process').spawn;
 exports.testProcessSpawnCleanuponException = function(test) {
   test.expect(4);
   var zoneFunc = function SpawnZone() {
-    function onClose(code, signal) { test.ok(true); }
+    function onClose(code, signal) {
+      test.ok(true);
+    }
 
     var p = spawn('cat', ['-']);
     p.on('close', onClose);
@@ -37,7 +39,9 @@ exports.testProcessExecInZone = function(test) {
       test.ok(!err);
       test.ok(/hello world/.test(stdout));
     }
-  }).then(function() { test.done(); });
+  }).then(function() { 
+    test.done(); 
+  });
 };
 
 exports.testProcessExecFailureInZone = function(test) {

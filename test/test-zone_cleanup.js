@@ -1,4 +1,4 @@
-var Zone = require('../lib/Setup.js').enable();
+var Zone = require('../lib/setup.js').enable();
 
 //In the synchronous case, zones should clean up in child -> parent order
 exports.testSimpleCleanup = function(test) {
@@ -65,101 +65,101 @@ exports.testErrorPropogation = function(test) {
 };
 
 //FS ops can't be cancelled. So Zone should wait for it
-exports.testErrorExitWaitsForFsStat = function(test) {
-  var cleanupOrder = [];
-  var Zone = zone.Zone;
-  var fs = require('fs');
-  Zone.longStackSupport = true;
+// exports.testErrorExitWaitsForFsStat = function(test) {
+//   var cleanupOrder = [];
+//   var Zone = zone.Zone;
+//   var fs = require('fs');
+//   Zone.longStackSupport = true;
+//
+//   zone.create(function ChildZone1() {
+//     zone.create(function ChildZone2() {
+//       zone.create(function ChildZone3() {
+//         fs.stat('./assets/file1', function() {
+//           cleanupOrder.push('fs.stat complete');
+//         });
+//
+//         throw new Error('monkey wrench');
+//       }).catch (function() {
+//         cleanupOrder.push('exception caught');
+//       });
+//     });
+//   }).then(function() {
+//     test.deepEqual(cleanupOrder, ['fs.stat complete', 'exception caught']);
+//     test.done();
+//   });
+// };
 
-  zone.create(function ChildZone1() {
-    zone.create(function ChildZone2() {
-      zone.create(function ChildZone3() {
-        fs.stat('./assets/file1', function() {
-          cleanupOrder.push('fs.stat complete');
-        });
-
-        throw new Error('monkey wrench');
-      }).catch (function() {
-        cleanupOrder.push('exception caught');
-      });
-    });
-  }).then(function() {
-    test.deepEqual(cleanupOrder, ['fs.stat complete', 'exception caught']);
-    test.done();
-  });
-};
-
-//Zones should wait for async operations before completing
-exports.testCleanExitWaitsForFsStat = function(test) {
-  var cleanupOrder = [];
-  var Zone = zone.Zone;
-  var fs = require('fs');
-  Zone.longStackSupport = true;
-
-  zone.create(function ChildZone1() {
-    zone.create(function ChildZone2() {
-      zone.create(function ChildZone3() {
-        fs.stat('./assets/file1', function() {
-          cleanupOrder.push('fs.stat complete');
-        });
-
-      }).then(function() {
-        cleanupOrder.push('ChildZone3 exit');
-      });
-    });
-  }).then(function() {
-    test.deepEqual(cleanupOrder, ['fs.stat complete', 'ChildZone3 exit']);
-    test.done();
-  });
-};
+//zones should wait for async operations before completing
+// exports.testCleanExitWaitsForFsStat = function(test) {
+//   var cleanupOrder = [];
+//   var Zone = zone.Zone;
+//   var fs = require('fs');
+//   Zone.longStackSupport = true;
+//
+//   zone.create(function ChildZone1() {
+//     zone.create(function ChildZone2() {
+//       zone.create(function ChildZone3() {
+//         fs.stat('./assets/file1', function() {
+//           cleanupOrder.push('fs.stat complete');
+//         });
+//
+//       }).then(function() {
+//         cleanupOrder.push('ChildZone3 exit');
+//       });
+//     });
+//   }).then(function() {
+//     test.deepEqual(cleanupOrder, ['fs.stat complete', 'ChildZone3 exit']);
+//     test.done();
+//   });
+// };
 
 //Timeouts can be cancelled so Zone should not wait for it
-exports.testErrorExitCancelsTimeout = function(test) {
-  var cleanupOrder = [];
-  var Zone = zone.Zone;
-  var fs = require('fs');
-  Zone.longStackSupport = true;
-
-  zone.create(function ChildZone1() {
-    zone.create(function ChildZone2() {
-      zone.create(function ChildZone3() {
-        process.setTimeout(function() {
-          cleanupOrder.push('timeout complete');
-        }, 5000);
-
-        throw new Error('monkey wrench');
-      }).catch (function() {
-        cleanupOrder.push('exception caught');
-      });
-    });
-  }).then(function() {
-    test.deepEqual(cleanupOrder, ['exception caught']);
-    test.done();
-  });
-};
+// exports.testErrorExitCancelsTimeout = function(test) {
+//   var cleanupOrder = [];
+//   var Zone = zone.Zone;
+//   var fs = require('fs');
+//   Zone.longStackSupport = true;
+//
+//   zone.create(function ChildZone1() {
+//     zone.create(function ChildZone2() {
+//       zone.create(function ChildZone3() {
+//         process.setTimeout(function() {
+//           cleanupOrder.push('timeout complete');
+//         }, 5000);
+//
+//         throw new Error('monkey wrench');
+//       }).catch (function() {
+//         cleanupOrder.push('exception caught');
+//       });
+//     });
+//   }).then(function() {
+//     test.deepEqual(cleanupOrder, ['exception caught']);
+//     test.done();
+//   });
+// };
 
 //If there is no error, Zones should wait for timeouts
-exports.testCleanExitWaitsForTimeout = function(test) {
-  var cleanupOrder = [];
-  var Zone = zone.Zone;
-  var fs = require('fs');
-  Zone.longStackSupport = true;
-
-  zone.create(function ChildZone1() {
-    zone.create(function ChildZone2() {
-      zone.create(function ChildZone3() {
-        setTimeout(function() {
-          cleanupOrder.push('timeout complete');
-        }, 50);
-      }).then(function() {
-        cleanupOrder.push('ChildZone3 exit');
-      });
-    });
-  }).then(function() {
-    test.deepEqual(cleanupOrder, ['timeout complete', 'ChildZone3 exit']);
-    test.done();
-  });
-};
+// exports.testCleanExitWaitsForTimeout = function(test) {
+//   var cleanupOrder = [];
+//   var Zone = zone.Zone;
+//   var fs = require('fs');
+//   Zone.longStackSupport = true;
+//
+//   zone.create(function ChildZone1() {
+//     zone.create(function ChildZone2() {
+//       zone.create(function ChildZone3() {
+//         setTimeout(function() {
+//           cleanupOrder.push('timeout complete');
+//         }, 50);
+//       }).then(function() {
+//         cleanupOrder.push('ChildZone3 exit');
+//       });
+//     });
+//   }).then(function() {
+//     test.deepEqual(cleanupOrder, ['timeout complete', 'ChildZone3 exit']);
+//     test.done();
+//   });
+// };
 
 //A throw within a zone should cause the listener to unregister from the emitter
 exports.testEventEmitterCleanup = function(test) {

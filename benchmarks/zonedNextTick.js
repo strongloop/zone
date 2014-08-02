@@ -1,5 +1,5 @@
 benchmark = require('./benchmark.js');
-require('../lib/Setup.js').enable();
+require('../lib/setup.js').enable();
 
 function benchNextTick(next) {
   process.nextTick(next); // Or fs.exists, whatever

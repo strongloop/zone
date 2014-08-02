@@ -1,1 +1,1 @@
-module.exports = require('./lib/Setup.js');
+module.exports = require('./lib/setup.js');

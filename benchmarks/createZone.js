@@ -1,5 +1,5 @@
 benchmark = require('./benchmark.js');
-require('../lib/Setup.js').enable();
+require('../lib/setup.js').enable();
 Error.stackTraceLimit = 0;
 
 function foo() {}

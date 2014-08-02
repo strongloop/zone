@@ -1,5 +1,5 @@
 var http = require('http');
-require('../lib/Setup.js').enable();
+require('../lib/setup.js').enable();
 Error.stackTraceLimit = 0;
 
 var numRequests = 1;
