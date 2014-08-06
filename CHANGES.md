@@ -1,3 +1,9 @@
+2014-08-06, Version 0.2.1
+=========================
+
+ * Remove strong-docs requirement (Krishna Raman)
+
+
 2014-08-04, Version 0.2.0
 =========================
 
