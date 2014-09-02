@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "sh -c \"node_modules/.bin/nodeunit test/test-*.js\"",
-    "posttest": "cd benchmarks; ./run_bench.sh"
+    "test": "istanbul cover --report cobertura nodeunit -- test/test-*.js",
+    "benchmark": "cd benchmarks; ./run_bench.sh"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/strongloop/zone",
   "devDependencies": {
+    "istanbul": "^0.3.0",
     "nodeunit": "^0.9.0"
   }
 }
