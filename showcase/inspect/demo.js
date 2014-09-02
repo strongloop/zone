@@ -12,17 +12,18 @@ zone.create(function ServerZone() {
   server.listen(3000);
 });
 
-
-for (var i = 0; i < 10; i++) {
-  zone.create(function ConnectionZone() {
-    var conn = net.connect(3000, function() {
-      zone.create(function IntervalZone() {
-        setInterval(function() {
-          conn.write('hello');
-        }, 1);
-      });
+function ConnectionZone() {
+  var conn = net.connect(3000, function() {
+    zone.create(function IntervalZone() {
+      setInterval(function() {
+        conn.write('hello');
+      }, 1);
     });
   });
+}
+
+for (var i = 0; i < 10; i++) {
+  zone.create(ConnectionZone);
 }
 
 console.log("Run the inspect tool to see what's going on in this process.");

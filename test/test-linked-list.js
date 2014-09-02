@@ -6,7 +6,7 @@ exports.pushPop = function(test) {
     l.push(i);
   }
 
-  for (var i = 9; i >= 0; i--) {
+  for (i = 9; i >= 0; i--) {
     test.equal(l.pop(), i);
   }
 
@@ -20,7 +20,7 @@ exports.shiftUnshift = function(test) {
     l.unshift(i);
   }
 
-  for (var i = 9; i >= 0; i--) {
+  for (i = 9; i >= 0; i--) {
     test.equal(l.shift(), i);
   }
 
@@ -34,7 +34,7 @@ exports.head = function(test) {
     l.push(i);
   }
 
-  for (var i = 0; i < 10; i++) {
+  for (i = 0; i < 10; i++) {
     test.equal(l.head(), i);
     l.shift();
   }
@@ -49,7 +49,7 @@ exports.tail = function(test) {
     l.push(i);
   }
 
-  for (var i = 9; i >= 0; i--) {
+  for (i = 9; i >= 0; i--) {
     test.equal(l.tail(), i);
     l.pop();
   }
