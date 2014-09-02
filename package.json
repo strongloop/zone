@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "sh -c \"node_modules/.bin/nodeunit tests/*.js\"",
+    "test": "sh -c \"node_modules/.bin/nodeunit test/test-*.js\"",
     "posttest": "cd benchmarks; ./run_bench.sh"
   },
   "repository": {
