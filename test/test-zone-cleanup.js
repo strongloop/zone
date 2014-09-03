@@ -1,4 +1,4 @@
-var Zone = require('../lib/Setup.js').enable();
+var Zone = require('../lib/setup.js').enable();
 
 //In the synchronous case, zones should clean up in child -> parent order
 exports.testSimpleCleanup = function(test) {

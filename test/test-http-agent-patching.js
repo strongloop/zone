@@ -1,4 +1,4 @@
-var Zone = require('../lib/Setup.js').enable();
+var Zone = require('../lib/setup.js').enable();
 var _http_agent = require('_http_agent');
 var Zone = zone.Zone;
 

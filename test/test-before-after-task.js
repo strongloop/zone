@@ -1,4 +1,4 @@
-var Zone = require('../lib/Setup.js').enable();
+var Zone = require('../lib/setup.js').enable();
 
 exports.testBeforeTask = function(test) {
   test.expect(2);
