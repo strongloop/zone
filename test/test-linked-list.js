@@ -1,4 +1,4 @@
-var LinkedList = require('../lib/LinkedList.js');
+var LinkedList = require('../lib/linked-list.js');
 
 exports.pushPop = function(test) {
   var l = new LinkedList('test');

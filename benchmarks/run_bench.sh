@@ -1,7 +1,7 @@
 #!/bin/sh
-node ./baseNextTick.js
-node ./zonedNextTick.js
-node ./createZone.js
+node ./base-next-tick.js
+node ./zoned-next-tick.js
+node ./create-zone.js
 
 which gobench 1> /dev/null 2> /dev/null
 if [ $? -ne 0 ]; then
@@ -12,14 +12,14 @@ if [ $? -ne 0 ]; then
   exit 0;
 fi
 
-node ./basicServer.js &
+node ./basic-server.js &
 sleep 1
 gobench -c=200 -k=true -r=501 -u="http://127.0.0.1:3001" 2>/dev/null 1>/dev/null
 sleep 1
-node ./basicServerWithZones.js &
+node ./basic-server-with-zones.js &
 sleep 1
 gobench -c=200 -k=true -r=501 -u="http://127.0.0.1:3001" 2>/dev/null 1>/dev/null
 sleep 1
-node ./zonedServer.js &
+node ./zoned-server.js &
 sleep 1
 gobench -c=200 -k=true -r=501 -u="http://127.0.0.1:3001" 2>/dev/null 1>/dev/null

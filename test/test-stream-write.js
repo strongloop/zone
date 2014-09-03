@@ -1,6 +1,6 @@
 /* global zone */
 
-require('../lib/Setup.js').enable();
+require('../lib/setup.js').enable();
 var Zone = zone.Zone;
 var net = require('net');
 

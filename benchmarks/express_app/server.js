@@ -1,4 +1,4 @@
-require('../../lib/Setup.js').enable();
+require('../../lib/setup.js').enable();
 express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
