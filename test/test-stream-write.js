@@ -28,8 +28,8 @@ exports.testWriterFromChildZone = function(test) {
 
   var writeZone = zone.create(function WriteZone() {
     process.stdout.write('Write from child zone\n', function() {
-      test.strictEqual(zone, writeZone);
-      test.notStrictEqual(zone, zone.root);
+      test.ok(zone === writeZone);
+      test.ok(zone !== zone.root);
     });
   }).then(function() { test.done(); });
 
