@@ -3,27 +3,38 @@
 require('../lib/setup.js').enable();
 var Zone = zone.Zone;
 var net = require('net');
+var isv010 = require('../lib/isv010.js');
 
 exports.testWriterFromRootZone = function(test) {
-  process.stdout.cork();
   test.expect(1);
+
+  if (!isv010)
+    process.stdout.cork();
+
   process.stdout.write('Write from root zone\n', function() {
     test.strictEqual(zone, zone.root);
     test.done();
   });
-  process.stdout.uncork();
+
+  if (!isv010)
+    process.stdout.uncork();
 };
 
 exports.testWriterFromChildZone = function(test) {
-  process.stdout.cork();
   test.expect(2);
+
+  if (!isv010)
+    process.stdout.cork();
+
   var writeZone = zone.create(function WriteZone() {
     process.stdout.write('Write from child zone\n', function() {
       test.strictEqual(zone, writeZone);
       test.notStrictEqual(zone, zone.root);
     });
   }).then(function() { test.done(); });
-  process.stdout.uncork();
+
+  if (!isv010)
+    process.stdout.uncork();
 };
 
 
