@@ -33,7 +33,7 @@ exports.testProcessExecInZone = function(test) {
     exec('echo hello world', callback);
 
     function callback(err, stdout, stderr) {
-      test.strictEqual(zone, execZone);
+      test.ok(zone === execZone);
       test.ok(!err);
       test.ok(/hello world/.test(stdout));
     }
