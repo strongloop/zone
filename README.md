@@ -15,6 +15,8 @@ Zones provide a way to group and track resources and errors across asynchronous 
   
 [Dart's async library](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-async.Zone) and [Brian Ford's zone.js](https://github.com/btford/zone.js/) library provide similar functionality.
 
+NOTE: Zones currently requires Node v0.11+. Support for v0.10 is in progress.
+
 ## Implementation status
 
 * The zone library and documentation are still under development: there are bugs, missing features, and limited documentation.
