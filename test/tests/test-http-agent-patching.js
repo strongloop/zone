@@ -2,17 +2,17 @@ require('../common.js');
 
 test.expect(2);
 
-var _http_agent = require('_http_agent');
+var http = require('http');
 var agent1, agent2, agent3;
 
-agent1 = _http_agent.globalAgent;
+agent1 = http.globalAgent;
 
 zone.create(function() {
-  agent2 = _http_agent.globalAgent;
+  agent2 = http.globalAgent;
 });
 
 zone.create(function() {
-  agent3 = _http_agent.globalAgent;
+  agent3 = http.globalAgent;
 });
 
 test.notStrictEqual(agent1, agent2);
