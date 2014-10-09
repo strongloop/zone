@@ -78,44 +78,48 @@ var serverZone = zone.create(function ServerZone() {
 // Create a separate zone to host all request zones.
 zone.create(function ClientZone() {
 
+  function RequestZone() {
+    // Set up the options for the http client.
+    var options = {
+      method: 'POST',
+      protocol: 'http:',
+      hostname: '127.0.0.1',
+      port: 3000,
+      pathname: '/hello/' + i
+    };
+
+    // Set the zone name so the error stack is descriptive.
+    this.name = 'POST ' + url.format(options);
+
+    // Do the actual http POST request.
+    var req = http.request(options);
+
+    // As part of the POST request, send "hello there" 100 times with a
+    // 1ms interval in between.
+    var helloCount = 0;
+    var helloInterval = setInterval(function() {
+      // If we haven't written 100 hellos yes, write another.
+      if (helloCount++ < 100)
+        return void req.write('hello there!\n');
+
+      // After writing hello 100 times, clear the interval and end the
+      // request.
+      clearInterval(helloInterval);
+      req.end();
+    }, 1);
+
+  }
+  
+  function ErrorHandler(err) {
+    // Print the failure stack but don't blow up the process.
+    console.error(err.zoneStack + '\n');
+  }
+
   // Create 10 clients that communicate with the server. The server has a
   // chaos monkey running around that randomly makes requests fail.
   for (var i = 0; i < 10; i++) {
     // Create a new zone for every individual request. This isolates connection
     // errors allowing us to handle then and log a useful stack trace for them.
-    zone.create(function RequestZone() {
-      // Set up the options for the http client.
-      var options = {
-        method: 'POST',
-        protocol: 'http:',
-        hostname: '127.0.0.1',
-        port: 3000,
-        pathname: '/hello/' + i
-      };
-
-      // Set the zone name so the error stack is descriptive.
-      this.name = 'POST ' + url.format(options);
-
-      // Do the actual http POST request.
-      var req = http.request(options);
-
-      // As part of the POST request, send "hello there" 100 times with a
-      // 1ms interval in between.
-      var helloCount = 0;
-      var helloInterval = setInterval(function() {
-        // If we haven't written 100 hellos yes, write another.
-        if (helloCount++ < 100)
-          return void req.write('hello there!\n');
-
-        // After writing hello 100 times, clear the interval and end the
-        // request.
-        clearInterval(helloInterval);
-        req.end();
-      }, 1);
-
-    }).catch (function(err) {
-      // Print the failure stack but don't blow up the process.
-      console.error(err.zoneStack + '\n');
-    });
+    zone.create(RequestZone).catch (ErrorHandler);
   }
 });

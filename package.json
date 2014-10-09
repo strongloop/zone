@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/nodeunit tests/[^_]*.js",
+    "test": "node test/run-tests.js",
     "posttest": "cd benchmarks; ./run_bench.sh"
   },
   "repository": {
@@ -16,8 +16,5 @@
   "bugs": {
     "url": "https://github.com/strongloop/zone/issues"
   },
-  "homepage": "https://github.com/strongloop/zone",
-  "devDependencies": {
-    "nodeunit": "^0.9.0"
-  }
+  "homepage": "https://github.com/strongloop/zone"
 }
