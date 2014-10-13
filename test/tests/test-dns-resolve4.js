@@ -7,5 +7,5 @@ dns.resolve4('www.strongloop.com', function(err, addresses) {
     throw err;
   }
   test.ok(typeof addresses === 'object');
-  test.strictEqual(zone, zone.root);
+  test.ok(zone === zone.root);
 });

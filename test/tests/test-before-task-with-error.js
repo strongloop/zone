@@ -9,7 +9,7 @@ var beforeHook = function() {
 };
 
 var failureCb = function(err) {
-  test.strictEqual(zone, zone.root);
+  test.ok(zone === zone.root);
   test.ok(/expected/.test(err));
   test.done();
 };

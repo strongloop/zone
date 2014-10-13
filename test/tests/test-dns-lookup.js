@@ -12,7 +12,7 @@ zone.create(function ChildZone() {
       throw err;
 
     test.ok(typeof address === 'string');
-    test.strictEqual(zone, childZone);
+    test.ok(zone === childZone);
   });
 }).then(function() {
   test.done();

@@ -10,12 +10,12 @@ var zoneFunc = function SpawnZone() {
   p.on('close', onClose);
 
   setTimeout(function() {
-    test.strictEqual(zone, spawnZone);
+    test.ok(zone === spawnZone);
     throw new Error('expected error');
   });
 };
 var cb = function(err) {
-  test.strictEqual(zone, zone.root);
+  test.ok(zone === zone.root);
   test.ok(/expected/.test(err));
   test.done();
 };

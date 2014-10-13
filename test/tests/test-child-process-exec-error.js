@@ -7,7 +7,7 @@ var zoneFunc = function ExecFileZone() {
   execFile('inv$alid~file', [], callback);
 
   function callback(err, stdout, stderr) {
-    test.strictEqual(zone, execFileZone);
+    test.ok(zone === execFileZone);
     throw err;
   }
 };
