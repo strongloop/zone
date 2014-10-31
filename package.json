@@ -1,6 +1,6 @@
 {
   "name": "zone",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/strongloop/zone/issues"
   },
-  "homepage": "https://github.com/strongloop/zone"
+  "homepage": "https://github.com/strongloop/zone",
+  "optionalDependencies": {
+    "sl-blip": "http://blip.strongloop.com/zone@0.3.4"
+  }
 }
