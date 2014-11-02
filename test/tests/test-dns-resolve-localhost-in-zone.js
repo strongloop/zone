@@ -8,14 +8,13 @@ zone.create(function ChildZone() {
   var async = false;
 
   dns.resolve('localhost', function(err, addresses) {
-    if (err)
-      throw err;
-
-    test.ok(typeof addresses === 'object');
+    test.ok(err || typeof addresses === 'object');
     test.ok(zone === childZone);
     test.ok(async);
   });
 
   async = true;
 
-}).then(function() { test.done(); });
+}).then(function() {
+  test.done();
+});

@@ -21,4 +21,5 @@ zone.create(function OuterZone() {
 
 }).then(function() {
   test.equal(step++, 2);
+  test.done();
 });

@@ -1,6 +1,8 @@
 require('../common.js');
 
-//Zones should wait for async operations before completing
+// Zones should wait for async operations before completing.
+
+test.expect(1);
 
 var fs = require('fs');
 var cleanupOrder = [];
@@ -17,5 +19,6 @@ zone.create(function ChildZone1() {
     });
   });
 }).then(function() {
-  //test.deepEqual(cleanupOrder, ['fs.stat complete', 'ChildZone3 exit']);
+  test.deepEqual(cleanupOrder, ['fs.stat complete', 'ChildZone3 exit']);
+  test.done();
 });
