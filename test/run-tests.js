@@ -1,13 +1,13 @@
 
 // Tests to run, and directories that have contain tests to be run.
 // Grow this list as necessary.
-var TESTS = ['tests'];
+var TESTS = ['zone-tests'];
 
 // Recurse into directories that match this filter.
 var DIR_FILTER = /^[^.].*$/;
 
 // Only test the files that match this filter.
-var FILE_FILTER = /^[^.].*\.*js$/;
+var FILE_FILTER = /^[^._].*\.*js$/;
 
 
 var cwd = process.cwd();
