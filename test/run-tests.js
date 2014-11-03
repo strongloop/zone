@@ -1,7 +1,7 @@
 
 // Tests to run, and directories that have contain tests to be run.
 // Grow this list as necessary.
-var TESTS = ['zone-tests'];
+var TESTS = ['zone-tests', 'node-tests/simple'];
 
 // Recurse into directories that match this filter.
 var DIR_FILTER = /^[^.].*$/;
