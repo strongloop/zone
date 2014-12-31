@@ -33,7 +33,7 @@ zone.create(function TestZone() {
       conn.end(buf, afterEnd);
     });
 
-    process._rawDebug('closing server');
+    process._rawDebug('# closing server');
     server.close();
   });
 
