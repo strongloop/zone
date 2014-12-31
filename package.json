@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --expose-gc test/run-tests.js",
+    "test": "node --expose-gc test/run-tests.js --tap-on-ci",
     "benchmarks": "cd benchmarks; ./run_bench.sh"
   },
   "repository": {
