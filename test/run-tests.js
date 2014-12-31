@@ -20,8 +20,20 @@ var execFile = require('child_process').execFile;
 var successes = 0;
 var failures = 0;
 
+if (process.env.TAP) {
+  console.log('TAP version 13');
+}
+
 testAll(function() {
   console.error('%d failed, %d passed', failures, successes);
+  if (process.env.TAP) {
+    console.log('\n1..%d', successes + failures);
+    console.log('# tests %d', successes + failures);
+    console.log('# pass %d', successes);
+    if (failures > 0) {
+      consooe.log('# fail %d', failures);
+    }
+  }
 });
 
 function testAll(cb) {
@@ -88,6 +100,9 @@ function testFile(path, cb) {
       console.error('pass: %s',
                     name);
       successes++;
+      if (process.env.TAP) {
+        console.log('ok %d - %s', successes + failures, name);
+      }
 
     } else {
       var output = stderr || stdout;
@@ -99,6 +114,10 @@ function testFile(path, cb) {
                     name,
                     output);
       failures++;
+      if (process.env.TAP) {
+        console.log('not ok %d - %s', successes + failures, name);
+        console.log('# %s', output.replace(/\n/g, '\n#'));
+      }
     }
 
     cb();
