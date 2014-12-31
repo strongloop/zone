@@ -31,7 +31,7 @@ testAll(function() {
     console.log('# tests %d', successes + failures);
     console.log('# pass %d', successes);
     if (failures > 0) {
-      consooe.log('# fail %d', failures);
+      console.log('# fail %d', failures);
     }
   }
 });
