@@ -1,3 +1,5 @@
+**NOTE: This project is deprecated and no longer being actively developed or maintained.**  See [Issue #50](https://github.com/strongloop/zone/issues/50) for details.
+
 # StrongLoop zone library
 
 ## Overview
@@ -16,8 +18,6 @@ Zones provide a way to group and track resources and errors across asynchronous 
 [Dart's async library](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-async.Zone) and [Brian Ford's zone.js](https://github.com/btford/zone.js/) library provide similar functionality.
 
 ## Implementation status
-
-* The zone library and documentation are still under development: there are bugs, missing features, and limited documentation.
 
 * The zone library dynamically modifies Node's asynchronous APIs at runtime.
   As detailed below, some of the modules have not yet been completed, and thus you cannot use them with zones.
