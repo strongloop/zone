@@ -12,7 +12,7 @@
     "url": "git://github.com/strongloop/zone.git"
   },
   "author": "",
-  "license": "CPAL-1.0 or http://strongloop.com/license",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/strongloop/zone/issues"
   },
